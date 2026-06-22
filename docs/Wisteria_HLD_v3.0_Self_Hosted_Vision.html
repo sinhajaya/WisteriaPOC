@@ -1,0 +1,2472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Wisteria Visual Style Matching — HLD v3.0 (Self-Hosted Vision)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --bg: #0f1117;
+  --surface: #181c27;
+  --surface2: #1e2333;
+  --border: #2a3047;
+  --border2: #364060;
+  --text: #e8eaf0;
+  --muted: #8892a4;
+  --hint: #4d5a73;
+  --teal: #2dd4bf;
+  --teal-dim: #1a8a7a;
+  --teal-bg: #0d2e2b;
+  --purple: #a78bfa;
+  --purple-bg: #1e1a3a;
+  --amber: #fbbf24;
+  --amber-bg: #2a2010;
+  --coral: #fb7185;
+  --coral-bg: #2a1020;
+  --blue: #60a5fa;
+  --blue-bg: #0f1e38;
+  --green: #4ade80;
+  --green-bg: #0d2a1a;
+  --sidebar-w: 240px;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  line-height: 1.7;
+  background: var(--bg);
+  color: var(--text);
+  display: flex;
+  min-height: 100vh;
+}
+a { color: var(--teal); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+/* SIDEBAR */
+.sidebar {
+  width: var(--sidebar-w);
+  min-width: var(--sidebar-w);
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  height: 100vh;
+  position: sticky;
+  top: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+}
+.sidebar-brand {
+  padding: 20px 20px 16px;
+  border-bottom: 1px solid var(--border);
+}
+.sidebar-brand .eyebrow {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: .1em;
+  color: var(--teal);
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+.sidebar-brand .title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.4;
+}
+.sidebar-brand .subtitle {
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 2px;
+}
+.sidebar-nav { padding: 12px 0 24px; flex: 1; }
+.nav-section {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: .08em;
+  color: var(--hint);
+  text-transform: uppercase;
+  padding: 12px 20px 4px;
+}
+.nav-link {
+  display: block;
+  padding: 6px 20px;
+  font-size: 13px;
+  color: var(--muted);
+  cursor: pointer;
+  border-left: 2px solid transparent;
+  transition: color .15s, border-color .15s, background .15s;
+}
+.nav-link:hover { color: var(--text); background: var(--surface2); text-decoration: none; }
+.nav-link.active { color: var(--teal); border-left-color: var(--teal); background: var(--teal-bg); }
+
+/* MAIN */
+.main { flex: 1; overflow-y: auto; }
+.content { max-width: 860px; padding: 40px 48px 80px; }
+
+/* SECTIONS */
+.section { display: none; }
+.section.active { display: block; }
+
+/* TYPOGRAPHY */
+h1 { font-size: 24px; font-weight: 600; color: var(--text); margin-bottom: 8px; }
+h2 { font-size: 18px; font-weight: 600; color: var(--text); margin: 36px 0 12px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+h2:first-child { margin-top: 0; }
+h3 { font-size: 14px; font-weight: 600; color: var(--text); margin: 24px 0 8px; }
+h3:first-child { margin-top: 0; }
+p { font-size: 13px; color: var(--muted); line-height: 1.75; margin-bottom: 12px; }
+p:last-child { margin-bottom: 0; }
+
+/* PAGE HEADER */
+.page-header { margin-bottom: 32px; }
+.page-header .eyebrow {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--teal);
+  margin-bottom: 6px;
+}
+.page-header h1 { margin-bottom: 6px; }
+.page-header .desc { font-size: 13px; color: var(--muted); }
+.badge-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+.badge {
+  display: inline-flex;
+  align-items: center;
+  font-size: 11px;
+  font-weight: 500;
+  padding: 3px 9px;
+  border-radius: 20px;
+  border: 1px solid;
+}
+.b-teal { background: var(--teal-bg); color: var(--teal); border-color: var(--teal-dim); }
+.b-purple { background: var(--purple-bg); color: var(--purple); border-color: #6d5fad; }
+.b-amber { background: var(--amber-bg); color: var(--amber); border-color: #7a5c10; }
+.b-coral { background: var(--coral-bg); color: var(--coral); border-color: #7a2a40; }
+.b-blue { background: var(--blue-bg); color: var(--blue); border-color: #2a4a7a; }
+.b-green { background: var(--green-bg); color: var(--green); border-color: #1a5a30; }
+.b-gray { background: var(--surface2); color: var(--muted); border-color: var(--border2); }
+
+/* CARDS */
+.card-grid { display: grid; gap: 12px; margin-bottom: 20px; }
+.g2 { grid-template-columns: repeat(2, minmax(0,1fr)); }
+.g3 { grid-template-columns: repeat(3, minmax(0,1fr)); }
+.g4 { grid-template-columns: repeat(4, minmax(0,1fr)); }
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px;
+}
+.card h3 { margin-top: 0; margin-bottom: 10px; }
+.metric {
+  background: var(--surface2);
+  border-radius: 8px;
+  padding: 14px 16px;
+}
+.metric .lbl { font-size: 11px; color: var(--hint); margin-bottom: 4px; }
+.metric .val { font-size: 26px; font-weight: 600; color: var(--text); line-height: 1; }
+.metric .sub { font-size: 11px; color: var(--hint); margin-top: 4px; }
+
+/* KV ROWS */
+.kv-table { width: 100%; }
+.kv-table tr { border-bottom: 1px solid var(--border); }
+.kv-table tr:last-child { border-bottom: none; }
+.kv-table td { padding: 7px 0; font-size: 12px; vertical-align: top; }
+.kv-table td:first-child { color: var(--muted); width: 50%; }
+.kv-table td:last-child { color: var(--text); font-weight: 500; font-family: 'JetBrains Mono', monospace; font-size: 11px; text-align: right; }
+
+/* CODE */
+pre, code {
+  font-family: 'JetBrains Mono', monospace;
+}
+code {
+  font-size: 11px;
+  background: var(--surface2);
+  color: var(--teal);
+  padding: 2px 6px;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+}
+pre {
+  font-size: 11.5px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 16px 18px;
+  overflow-x: auto;
+  color: var(--text);
+  line-height: 1.65;
+  margin-bottom: 16px;
+  white-space: pre;
+}
+pre .c { color: var(--hint); }
+pre .k { color: var(--teal); }
+pre .s { color: var(--amber); }
+pre .t { color: var(--purple); }
+
+/* STEPS */
+.steps { display: flex; flex-direction: column; gap: 0; }
+.step { display: flex; gap: 16px; position: relative; }
+.step:not(:last-child)::before {
+  content: '';
+  position: absolute;
+  left: 14px;
+  top: 32px;
+  bottom: 0;
+  width: 1px;
+  background: var(--border);
+}
+.step-num {
+  width: 29px;
+  height: 29px;
+  border-radius: 50%;
+  background: var(--surface2);
+  border: 1px solid var(--border2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--teal);
+  flex-shrink: 0;
+  margin-top: 2px;
+  z-index: 1;
+}
+.step-body { padding-bottom: 24px; flex: 1; }
+.step-title { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+.step-desc { font-size: 12px; color: var(--muted); line-height: 1.65; }
+.step-tags { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
+
+/* INFO / WARN bars */
+.info-bar, .warn-bar {
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 12px;
+  line-height: 1.6;
+  margin-bottom: 16px;
+  display: flex;
+  gap: 8px;
+}
+.info-bar { background: var(--teal-bg); color: var(--teal); border: 1px solid var(--teal-dim); }
+.warn-bar { background: var(--amber-bg); color: var(--amber); border: 1px solid #7a5c10; }
+.bar-icon { flex-shrink: 0; font-size: 14px; margin-top: 1px; }
+
+/* MAP TABLE */
+.map-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+.map-table th {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  color: var(--hint);
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border2);
+  text-align: left;
+}
+.map-table td {
+  font-size: 12px;
+  padding: 9px 12px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+  line-height: 1.55;
+}
+.map-table tr:last-child td { border-bottom: none; }
+.map-table td:first-child { color: var(--muted); }
+.map-table td:last-child { color: var(--text); }
+.map-table .arr { color: var(--hint); text-align: center; width: 32px; }
+
+/* SCHEMA TABLE */
+.schema-table { width: 100%; border-collapse: collapse; margin-bottom: 16px; }
+.schema-table th {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--hint);
+  letter-spacing: .04em;
+  padding: 6px 10px;
+  border-bottom: 1px solid var(--border2);
+  text-align: left;
+}
+.schema-table td {
+  font-size: 12px;
+  padding: 7px 10px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+}
+.schema-table tr:last-child td { border-bottom: none; }
+.fn-col { font-family: 'JetBrains Mono', monospace; color: var(--text); }
+.ft-col { font-family: 'JetBrains Mono', monospace; color: var(--blue); }
+.fd-col { color: var(--muted); }
+
+/* API ENDPOINT */
+.endpoint {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+.endpoint .method {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 7px;
+  border-radius: 5px;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+.method-post { background: #1a3a20; color: var(--green); }
+.method-get { background: var(--blue-bg); color: var(--blue); }
+.endpoint .path { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--text); }
+.endpoint .desc { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+/* PIPELINE SVG DIAGRAM */
+.pipeline-diagram {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 24px 16px 20px;
+  margin-bottom: 28px;
+  overflow: hidden;
+}
+.pipeline-diagram svg { display: block; width: 100%; }
+
+/* FILE TREE */
+.filetree {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  line-height: 1.9;
+  color: var(--muted);
+}
+.filetree .dir { color: var(--teal); }
+.filetree .file { color: var(--text); }
+.filetree .comment { color: var(--hint); }
+
+/* DIVIDER */
+hr { border: none; border-top: 1px solid var(--border); margin: 28px 0; }
+
+/* FOOTER */
+.doc-footer {
+  margin-top: 48px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
+  font-size: 11px;
+  color: var(--hint);
+  display: flex;
+  justify-content: space-between;
+}
+
+/* SCROLLBAR */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+
+@media (max-width: 800px) {
+  .sidebar { display: none; }
+  .content { padding: 24px 20px 60px; }
+  .g4 { grid-template-columns: repeat(2, minmax(0,1fr)); }
+  .g3 { grid-template-columns: repeat(2, minmax(0,1fr)); }
+}
+
+/* ── Flow & Cost embed ─────────────────────────────────── */
+.fc-wrap { background:#fff; border-radius:10px; overflow:hidden; margin:-8px 0 0; }
+.fc-wrap .tabs { display:flex; gap:4px; padding:16px 20px 0; flex-wrap:wrap; }
+.fc-wrap .tab { padding:8px 20px; border-radius:8px 8px 0 0; cursor:pointer; font-size:13px; font-weight:600; border:2px solid transparent; transition:all 0.2s; }
+.fc-wrap .tab.active { background:#fff; border-color:#e5e7eb; border-bottom-color:#fff; color:#7c3aed; }
+.fc-wrap .tab:not(.active) { color:#6b7280; background:#f3f4f6; }
+.fc-wrap .tab:hover:not(.active) { background:#e9eaec; }
+.fc-wrap .tab.green.active { color:#059669; }
+.fc-wrap .tab.green:not(.active) { color:#6b7280; }
+.fc-wrap .panel { display:none; background:#fff; border:2px solid #e5e7eb; border-radius:0 12px 12px 12px; margin:0 20px 20px; padding:24px; }
+.fc-wrap .panel.active { display:block; }
+.fc-wrap .flow-wrap { overflow-x:auto; }
+.fc-wrap svg.flow { min-width:960px; width:100%; height:auto; }
+.fc-wrap .mode-banner { border-radius:10px; padding:10px 16px; margin-bottom:16px; font-size:13px; font-weight:600; display:flex; align-items:center; gap:8px; }
+.fc-wrap .mode-banner.claude { background:#faf5ff; border:1.5px solid #7c3aed; color:#6d28d9; }
+.fc-wrap .mode-banner.trained { background:#f0fdf4; border:1.5px solid #059669; color:#065f46; }
+.fc-wrap .cost-header { font-size:13px; color:#374151; margin-bottom:16px; }
+.fc-wrap .slider-row { display:flex; align-items:center; gap:12px; margin-bottom:20px; flex-wrap:wrap; }
+.fc-wrap .slider-row label { font-size:13px; font-weight:600; color:#111827; white-space:nowrap; }
+.fc-wrap input[type=range].purple { accent-color:#7c3aed; flex:1; min-width:120px; }
+.fc-wrap input[type=range].green  { accent-color:#059669; flex:1; min-width:120px; }
+.fc-wrap .slider-val { font-size:13px; font-weight:700; min-width:100px; text-align:right; }
+.fc-wrap .slider-val.purple { color:#7c3aed; }
+.fc-wrap .slider-val.green  { color:#059669; }
+.fc-wrap .cost-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:20px; }
+.fc-wrap .cost-card { background:#f9fafb; border:1.5px solid #e5e7eb; border-radius:10px; padding:14px 16px; }
+.fc-wrap .cost-card .label { font-size:11px; color:#374151; font-weight:600; text-transform:uppercase; letter-spacing:.05em; margin-bottom:4px; }
+.fc-wrap .cost-card .value { font-size:22px; font-weight:700; color:#111827; }
+.fc-wrap .cost-card .sub { font-size:11px; color:#4b5563; margin-top:2px; }
+.fc-wrap .cost-card.highlight-purple { border-color:#7c3aed; background:#faf5ff; }
+.fc-wrap .cost-card.highlight-purple .value { color:#7c3aed; }
+.fc-wrap .cost-card.highlight-green { border-color:#059669; background:#f0fdf4; }
+.fc-wrap .cost-card.highlight-green .value { color:#059669; }
+.fc-wrap .cost-card.highlight-amber { border-color:#d97706; background:#fffbeb; }
+.fc-wrap .cost-card.highlight-amber .value { color:#d97706; }
+.fc-wrap .breakdown { border:1.5px solid #e5e7eb; border-radius:10px; overflow:hidden; margin-bottom:16px; }
+.fc-wrap .breakdown-head { display:grid; grid-template-columns:1fr 100px 100px 130px; background:#e9eaec; padding:10px 16px; font-size:11px; font-weight:700; color:#111827; text-transform:uppercase; letter-spacing:.04em; }
+.fc-wrap .breakdown-row { display:grid; grid-template-columns:1fr 100px 100px 130px; padding:10px 16px; border-top:1px solid #e5e7eb; font-size:13px; align-items:center; color:#111827; }
+.fc-wrap .breakdown-row:nth-child(even) { background:#f3f4f6; }
+.fc-wrap .dot { width:8px; height:8px; border-radius:50%; display:inline-block; margin-right:6px; flex-shrink:0; }
+.fc-wrap .name-cell { display:flex; align-items:center; font-weight:500; color:#111827; }
+.fc-wrap .scale-table { border:1.5px solid #e5e7eb; border-radius:10px; overflow:hidden; }
+.fc-wrap .scale-table table { width:100%; border-collapse:collapse; font-size:12.5px; }
+.fc-wrap .scale-table th { background:#e9eaec; padding:8px 14px; text-align:left; font-weight:700; color:#111827; }
+.fc-wrap .scale-table td { padding:8px 14px; border-top:1px solid #e5e7eb; color:#111827; }
+.fc-wrap .scale-table tr:nth-child(even) td { background:#f3f4f6; }
+.fc-wrap .badge { display:inline-block; padding:2px 8px; border-radius:20px; font-size:10px; font-weight:700; }
+.fc-wrap .badge.green { background:#d1fae5; color:#065f46; }
+.fc-wrap .badge.yellow { background:#fef3c7; color:#92400e; }
+.fc-wrap .badge.red { background:#fee2e2; color:#991b1b; }
+.fc-wrap .note { font-size:11px; color:#374151; padding:10px 14px; }
+.fc-wrap .compare-bar { display:flex; align-items:center; gap:10px; background:#f8fafc; border:1.5px solid #e2e8f0; border-radius:10px; padding:12px 16px; margin-bottom:20px; flex-wrap:wrap; }
+.fc-wrap .compare-bar span { font-size:12px; color:#111827; }
+.fc-wrap .compare-bar strong { font-size:13px; color:#111827; }
+.fc-wrap .compare-bar .vs-sep { color:#d1d5db; font-size:18px; font-weight:300; }
+.fc-wrap .training-note { background:#fffbeb; border:1.5px solid #f59e0b; border-radius:10px; padding:12px 16px; font-size:12px; color:#78350f; margin-bottom:16px; }
+.fc-wrap * { box-sizing:border-box; }
+.fc-wrap, .fc-wrap .panel { color:#111827; }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<nav class="sidebar">
+  <div class="sidebar-brand">
+    <div class="eyebrow">HLD — v3.0</div>
+    <div class="title">Wisteria Visual Style Matching</div>
+    <div class="subtitle">Spring Boot · React · CLIP · Qwen2.5-VL · pgvector</div>
+  </div>
+  <div class="sidebar-nav">
+    <div class="nav-section">Document</div>
+    <a class="nav-link active" onclick="nav('overview')">Overview</a>
+    <a class="nav-link" onclick="nav('stack')">Stack mapping</a>
+    <div class="nav-section">Pipelines</div>
+    <a class="nav-link" onclick="nav('offline')">Offline pipeline</a>
+    <a class="nav-link" onclick="nav('online')">Online pipeline</a>
+    <div class="nav-section">Implementation</div>
+    <a class="nav-link" onclick="nav('structure')">Project structure</a>
+    <a class="nav-link" onclick="nav('data')">Data models</a>
+    <a class="nav-link" onclick="nav('api')">API contract</a>
+    <a class="nav-link" onclick="nav('implnotes')">v3.0 build notes</a>
+    <div class="nav-section">Model layer</div>
+    <a class="nav-link" onclick="nav('training')">Training &amp; distillation</a>
+    <div class="nav-section">Operations</div>
+    <a class="nav-link" onclick="nav('setup')">Local setup guide</a>
+    <a class="nav-link" onclick="nav('nfr')">NFR &amp; failure modes</a>
+    <div class="nav-section">Economics</div>
+    <a class="nav-link" onclick="nav('cost')">Cost analysis</a>
+    <a class="nav-link" onclick="nav('flowdiagram')">Flow diagram</a>
+    <a class="nav-link" onclick="nav('costcalc')">Cost calculator</a>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<div class="main">
+<div class="content">
+
+<!-- ═══════════════════════════════════════════
+     SECTION: OVERVIEW
+═══════════════════════════════════════════ -->
+<div id="s-overview" class="section active">
+  <div class="page-header">
+    <div class="eyebrow">High Level Design</div>
+    <h1>Wisteria — Visual Style Matching</h1>
+    <div class="desc">Upload a room photo, Instagram screenshot, or magazine scan. CLIP captures visual style; a fine-tuned, self-hosted vision model (Qwen2.5-VL) extracts the style taxonomy; vector similarity returns the closest Wisteria catalog products — each with a deterministic, template-built explanation of why it matches. No third-party LLM sits on the per-query critical path.</div>
+    <div class="badge-row">
+      <span class="badge b-gray">v3.0 — Self-hosted vision</span>
+      <span class="badge b-teal">Spring Boot 3.x</span>
+      <span class="badge b-purple">React 18</span>
+      <span class="badge b-teal">CLIP ViT-L/14</span>
+      <span class="badge b-coral">Fine-tuned Qwen2.5-VL</span>
+      <span class="badge b-blue">pgvector</span>
+      <span class="badge b-amber">Redis</span>
+      <span class="badge b-gray">Docker Compose</span>
+    </div>
+  </div>
+
+  <!-- Pipeline flow diagram -->
+  
+<div class="info-bar" style="margin-bottom:20px;">
+  <div class="bar-icon">✓</div>
+  <div>
+    <strong>Goal:</strong> Deliver robust visual search where every per-query model runs on our own infrastructure. Upload an image, extract style attributes using a fine-tuned, self-hosted VLM, generate CLIP embeddings, perform ANN search using pgvector HNSW, apply in-memory attribute boosting, and build explanations deterministically from the matched attributes.
+  </div>
+</div>
+
+<div class="warn-bar" style="margin-bottom:20px;">
+  <div class="bar-icon">⚠</div>
+  <div>
+    <strong>What changed from v2.1 → v3.0:</strong> Claude Vision is removed from the per-query path and replaced by a fine-tuned <strong>Qwen2.5-VL</strong> attribute extractor (Florence-2 as a lighter alternative). Claude Haiku explanations are replaced by a deterministic <strong>template engine</strong>. An LLM is now <em>optional</em> and reserved for a separate conversational endpoint. Claude's only remaining role is offline: as the teacher that bootstraps the VLM's training labels (Phase 1). CLIP, pgvector, Spring Boot, re-ranking and the API contract are unchanged.
+  </div>
+</div>
+
+<h2>Component Architecture (v3.0)</h2>
+<table class="map-table">
+<tbody>
+<tr><td>Frontend</td><td class="arr">→</td><td>React/Vite on :3000 with API proxying to Spring Boot</td></tr>
+<tr><td>Orchestration Layer</td><td class="arr">→</td><td>Spring Boot 3.x on :8080 using Java 21 Virtual Threads</td></tr>
+<tr><td>Vector Engine</td><td class="arr">→</td><td>PostgreSQL + pgvector on :5432 with HNSW cosine search</td></tr>
+<tr><td>Vectorization</td><td class="arr">→</td><td>FastAPI + open_clip on :5001 producing 768-dimensional vectors</td></tr>
+<tr><td>Attribute Extraction</td><td class="arr">→</td><td>Fine-tuned Qwen2.5-VL self-hosted on :5002 (FastAPI/vLLM), strict JSON taxonomy output</td></tr>
+<tr><td>Explanation</td><td class="arr">→</td><td>Deterministic template engine in Java — no model call, no API</td></tr>
+<tr><td>Conversational (optional)</td><td class="arr">→</td><td>An LLM (Claude / self-hosted), reserved for the <code>/style/chat</code> reasoning endpoint only</td></tr>
+</tbody>
+</table>
+
+<h2>Online Query Pipeline (v3.0)</h2>
+<div class="steps">
+<div class="step"><div class="step-num">1</div><div class="step-body"><div class="step-title">Ingestion</div><div class="step-desc">Image uploaded, resized to 336x336 and Base64 encoded.</div></div></div>
+<div class="step"><div class="step-num">2</div><div class="step-body"><div class="step-title">Parallel AI Extraction</div><div class="step-desc">CLIP generates a 768-dimensional vector while the fine-tuned Qwen2.5-VL extracts material, finish, silhouette, era, palette and mood as strict JSON. Both models are self-hosted.</div></div></div>
+<div class="step"><div class="step-num">3</div><div class="step-body"><div class="step-title">Broad Vector Search</div><div class="step-desc">Top 100 visually similar products retrieved from pgvector HNSW using cosine similarity.</div></div></div>
+<div class="step"><div class="step-num">4</div><div class="step-body"><div class="step-title">In-Memory Boosting</div><div class="step-desc">Attribute matches receive positive score multipliers and Top 8 results are selected.</div></div></div>
+<div class="step"><div class="step-num">5</div><div class="step-body"><div class="step-title">Template Explainability</div><div class="step-desc">The matched attributes for each of the Top 8 are rendered into a consistent, trustworthy explanation by a deterministic template engine — no model call.</div></div></div>
+<div class="step"><div class="step-num">6</div><div class="step-body"><div class="step-title">Response</div><div class="step-desc">Final ranked results and explanations are returned synchronously to the React UI.</div></div></div>
+</div>
+
+<div class="pipeline-diagram">
+    <svg viewBox="0 0 780 90" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <marker id="ah" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="5" markerHeight="5" orient="auto">
+          <path d="M1 1L7 4L1 7" fill="none" stroke="#4d5a73" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </marker>
+      </defs>
+      <!-- boxes -->
+      <g>
+        <rect x="10" y="25" width="100" height="40" rx="7" fill="#1e2333" stroke="#364060" stroke-width="1"/>
+        <text x="60" y="42" text-anchor="middle" font-family="Inter,sans-serif" font-size="10" font-weight="600" fill="#e8eaf0">React UI</text>
+        <text x="60" y="56" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#8892a4">Image upload</text>
+      </g>
+      <line x1="110" y1="45" x2="135" y2="45" stroke="#4d5a73" stroke-width="1" marker-end="url(#ah)"/>
+      <g>
+        <rect x="135" y="25" width="116" height="40" rx="7" fill="#1a1a3a" stroke="#6d5fad" stroke-width="1"/>
+        <text x="193" y="42" text-anchor="middle" font-family="Inter,sans-serif" font-size="10" font-weight="600" fill="#a78bfa">Spring Boot :8080</text>
+        <text x="193" y="56" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#8892a4">Orchestration</text>
+      </g>
+      <line x1="251" y1="45" x2="276" y2="45" stroke="#4d5a73" stroke-width="1" marker-end="url(#ah)"/>
+      <g>
+        <rect x="276" y="5" width="110" height="40" rx="7" fill="#0d2e2b" stroke="#1a8a7a" stroke-width="1"/>
+        <text x="331" y="22" text-anchor="middle" font-family="Inter,sans-serif" font-size="10" font-weight="600" fill="#2dd4bf">CLIP :5001</text>
+        <text x="331" y="36" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#8892a4">FastAPI + open_clip</text>
+      </g>
+      <g>
+        <rect x="276" y="50" width="110" height="40" rx="7" fill="#2a1020" stroke="#7a2a40" stroke-width="1"/>
+        <text x="331" y="67" text-anchor="middle" font-family="Inter,sans-serif" font-size="10" font-weight="600" fill="#fb7185">Qwen2.5-VL :5002</text>
+        <text x="331" y="81" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#8892a4">Attribute extraction</text>
+      </g>
+      <!-- fan paths -->
+      <path d="M251 40 L265 40 L265 25 L276 25" fill="none" stroke="#4d5a73" stroke-width="1" marker-end="url(#ah)"/>
+      <path d="M251 50 L265 50 L265 70 L276 70" fill="none" stroke="#4d5a73" stroke-width="1" marker-end="url(#ah)"/>
+      <!-- rejoin -->
+      <path d="M386 25 L400 25 L400 45 L425 45" fill="none" stroke="#4d5a73" stroke-width="1" marker-end="url(#ah)"/>
+      <path d="M386 70 L400 70 L400 45" fill="none" stroke="#4d5a73" stroke-width="1"/>
+      <g>
+        <rect x="425" y="25" width="110" height="40" rx="7" fill="#0f1e38" stroke="#2a4a7a" stroke-width="1"/>
+        <text x="480" y="42" text-anchor="middle" font-family="Inter,sans-serif" font-size="10" font-weight="600" fill="#60a5fa">pgvector :5432</text>
+        <text x="480" y="56" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#8892a4">ANN cosine search</text>
+      </g>
+      <line x1="535" y1="45" x2="558" y2="45" stroke="#4d5a73" stroke-width="1" marker-end="url(#ah)"/>
+      <g>
+        <rect x="558" y="25" width="100" height="40" rx="7" fill="#1a1a3a" stroke="#6d5fad" stroke-width="1"/>
+        <text x="608" y="42" text-anchor="middle" font-family="Inter,sans-serif" font-size="10" font-weight="600" fill="#a78bfa">Re-rank + template</text>
+        <text x="608" y="56" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#8892a4">Weighted score + render</text>
+      </g>
+      <line x1="658" y1="45" x2="680" y2="45" stroke="#4d5a73" stroke-width="1" marker-end="url(#ah)"/>
+      <g>
+        <rect x="680" y="25" width="90" height="40" rx="7" fill="#1e2333" stroke="#364060" stroke-width="1"/>
+        <text x="725" y="42" text-anchor="middle" font-family="Inter,sans-serif" font-size="10" font-weight="600" fill="#e8eaf0">Results</text>
+        <text x="725" y="56" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#8892a4">Top-8 + why_matches</text>
+      </g>
+    </svg>
+  </div>
+
+  <h2>What runs on your local machine</h2>
+  <p>Five processes share <code>localhost</code> via Docker Compose. The React dev server is the only process outside Docker, running on port 3000 with Vite's proxy forwarding all <code>/api</code> calls to Spring Boot on 8080. Both model servers (CLIP and the fine-tuned VLM) are self-hosted — nothing on the per-query path leaves the machine.</p>
+
+  <div class="card-grid g4" style="margin-bottom:20px">
+    <div class="metric"><div class="lbl">React frontend</div><div class="val">:3000</div><div class="sub">Vite dev server</div></div>
+    <div class="metric"><div class="lbl">Spring Boot API</div><div class="val">:8080</div><div class="sub">style-query-service</div></div>
+    <div class="metric"><div class="lbl">CLIP Python server</div><div class="val">:5001</div><div class="sub">FastAPI + open_clip</div></div>
+    <div class="metric"><div class="lbl">VLM Python server</div><div class="val">:5002</div><div class="sub">Qwen2.5-VL + LoRA</div></div>
+  </div>
+  <div class="card-grid g3">
+    <div class="metric"><div class="lbl">PostgreSQL + pgvector</div><div class="val">:5432</div><div class="sub">ankane/pgvector image</div></div>
+    <div class="metric"><div class="lbl">Redis</div><div class="val">:6379</div><div class="sub">redis:7-alpine</div></div>
+    <div class="metric"><div class="lbl">Image storage</div><div class="val">local disk</div><div class="sub">/tmp/wisteria-uploads/</div></div>
+  </div>
+
+  <h2>Design decisions</h2>
+  <div class="card-grid g2">
+    <div class="card">
+      <h3>Why CLIP ViT-L/14?</h3>
+      <p>CLIP is trained on image-text pairs, so its embedding space naturally encodes aesthetic style rather than object identity. A ResNet backbone would cluster by object type (chair, lamp, table); CLIP clusters by visual style (Japandi, mid-century, ornate). Same model version must be used for both catalog indexing and query-time embedding — a version mismatch corrupts the embedding space.</p>
+    </div>
+    <div class="card">
+      <h3>Why pgvector over a dedicated vector DB?</h3>
+      <p>For a POC catalog of 20–500 products, pgvector with HNSW is more than sufficient. It keeps the stack to a single Docker container and lets us use Spring Data JPA natively. The production migration path is clear: swap the repository layer for a Pinecone client when the catalog exceeds ~2M items or query volume demands sub-10ms ANN latency.</p>
+    </div>
+    <div class="card">
+      <h3>Why parallel fan-out with virtual threads?</h3>
+      <p>CLIP embedding (~3–6s on CPU) and Claude Vision attribute extraction (~800ms) are independent. Running them sequentially would make the pipeline 4–7s. Java 21 virtual threads make <code>CompletableFuture.allOf()</code> extremely cheap — no thread pool sizing needed. Total latency is bounded by the slower call (CLIP on CPU), not their sum.</p>
+    </div>
+    <div class="card">
+      <h3>Why pHash for Redis caching?</h3>
+      <p>Perceptual hashing (DCT-based, 64-bit) allows cache hits for the same inspiration image even if re-uploaded at a slightly different size or JPEG quality. A byte-exact hash would miss these. A Redis cache hit bypasses the entire pipeline and responds in under 80ms — important for demo scenarios where the same image is uploaded multiple times.</p>
+    </div>
+    <div class="card">
+      <h3>Why a fine-tuned VLM over Claude Vision?</h3>
+      <p>Attribute extraction here is a fixed, closed taxonomy (material / finish / silhouette / era / palette / mood) — a classification problem, not open reasoning. A fine-tuned Qwen2.5-VL matches Claude's output on our own labels while running self-hosted: no per-query API cost, no external rate limit, predictable latency, and consistent terminology. Florence-2 is the lighter alternative when GPU budget is tight. Claude remains the teacher that produces the training labels offline.</p>
+    </div>
+    <div class="card">
+      <h3>Why deterministic template explanations?</h3>
+      <p>E-commerce users need consistent, trustworthy reasons a product matched — not creative prose. Once the matched attributes are known (oak · Japandi · warm-neutral), the explanation is a pure function of that data, so a template engine renders it in &lt;1 ms with zero variance and zero cost. Genuinely creative or conversational reasoning ("which of these brightens a dark room?") is routed to the optional <code>/style/chat</code> LLM endpoint instead.</p>
+    </div>
+  </div>
+
+  <div class="doc-footer">
+    <span>Wisteria Visual Style Matching — HLD v2.1</span>
+    <span>POC / Local Machine Build</span>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     SECTION: STACK MAPPING
+═══════════════════════════════════════════ -->
+<div id="s-stack" class="section">
+  <div class="page-header">
+    <div class="eyebrow">Stack mapping</div>
+    <h1>Cloud → Local replacements</h1>
+    <div class="desc">Every production cloud service maps to a free, locally-runnable equivalent. The data models, API shape, and business logic stay identical.</div>
+  </div>
+
+  <h2>Service substitutions</h2>
+  <table class="map-table">
+    <thead>
+      <tr><th>Production component</th><th class="arr"></th><th>POC local replacement</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="badge b-blue">AWS SageMaker</span> CLIP endpoint</td>
+        <td class="arr">→</td>
+        <td><span class="badge b-teal">FastAPI :5001</span>&nbsp; Python server, <code>open_clip</code> library, CPU or Apple Silicon MPS inference. ~1.7 GB model download on first start.</td>
+      </tr>
+      <tr>
+        <td><span class="badge b-blue">AWS RDS</span> PostgreSQL + pgvector</td>
+        <td class="arr">→</td>
+        <td><span class="badge b-gray">Docker</span>&nbsp; <code>ankane/pgvector:latest</code> on <code>:5432</code>. Same schema, same HNSW index, same Spring Data JPA queries.</td>
+      </tr>
+      <tr>
+        <td><span class="badge b-blue">AWS ElastiCache</span> Redis</td>
+        <td class="arr">→</td>
+        <td><span class="badge b-gray">Docker</span>&nbsp; <code>redis:7-alpine</code> on <code>:6379</code>. Same pHash cache key, same TTL logic, same <code>RedisTemplate</code> calls.</td>
+      </tr>
+      <tr>
+        <td><span class="badge b-blue">S3</span> presigned upload</td>
+        <td class="arr">→</td>
+        <td><span class="badge b-gray">Local disk</span>&nbsp; Multipart POST → Spring Boot saves to <code>/tmp/wisteria-uploads/{uuid}.jpg</code> via <code>Files.copy()</code>. Spring Boot also serves catalog images as static resources.</td>
+      </tr>
+      <tr>
+        <td><span class="badge b-blue">Spring Batch</span> + EKS CronJob</td>
+        <td class="arr">→</td>
+        <td><span class="badge b-purple">CommandLineRunner</span>&nbsp; Triggered by <code>--spring.profiles.active=index</code> or via <code>POST /api/v1/admin/index</code>.</td>
+      </tr>
+      <tr>
+        <td><span class="badge b-blue">Kafka</span> catalog events</td>
+        <td class="arr">→</td>
+        <td><span class="badge b-gray">Removed</span>&nbsp; Not needed for POC. Indexing is triggered manually. Production migration path: add a Kafka consumer for <code>catalog.product.updated</code> topic.</td>
+      </tr>
+      <tr>
+        <td><span class="badge b-blue">AWS SageMaker</span> VLM endpoint (attribute extraction)</td>
+        <td class="arr">→</td>
+        <td><span class="badge b-coral">FastAPI :5002</span>&nbsp; Self-hosted <strong>fine-tuned Qwen2.5-VL</strong> (LoRA-merged) served via vLLM/transformers. CPU works but is slow; a single 24 GB GPU (RTX 4090 / L40) runs the 7B comfortably. Florence-2 is the lighter, cheaper alternative.</td>
+      </tr>
+      <tr>
+        <td><span class="badge b-coral">Claude Vision API</span> (per-query)</td>
+        <td class="arr">→</td>
+        <td><span class="badge b-gray">Removed from runtime</span>&nbsp; Retained <em>offline only</em> as the labeling teacher that produces the VLM training set (Phase 1). Optionally retained behind the <code>/style/chat</code> endpoint for conversational reasoning.</td>
+      </tr>
+      <tr>
+        <td><span class="badge b-coral">Claude Haiku</span> (explanations)</td>
+        <td class="arr">→</td>
+        <td><span class="badge b-purple">Template engine</span>&nbsp; Pure Java <code>ExplanationService</code>. Deterministic render from the matched-attribute map. No model, no API, no timeout path.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>What stays identical to production</h2>
+  <div class="card-grid g2">
+    <div class="card">
+      <table class="kv-table">
+        <tr><td>REST API contract</td><td>100% same — production-ready shape</td></tr>
+        <tr><td>pgvector schema + HNSW index</td><td>Identical DDL and queries</td></tr>
+        <tr><td>CLIP model</td><td>ViT-L/14, same version, CPU vs GPU only diff</td></tr>
+        <tr><td>VLM attribute schema</td><td>Same 6-field taxonomy as v2.1's prompt</td></tr>
+      </table>
+    </div>
+    <div class="card">
+      <table class="kv-table">
+        <tr><td>Re-ranking logic</td><td>0.65×cosine + 0.35×attribute overlap</td></tr>
+        <tr><td>Explanation generation</td><td>Deterministic template render (no API call)</td></tr>
+        <tr><td>pHash Redis cache</td><td>Same key format, TTL, and eviction policy</td></tr>
+        <tr><td>Spring Boot service layer</td><td>No cloud SDK dependencies in core logic</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <h2>Inter-process ports</h2>
+  <div class="card-grid g4">
+    <div class="card">
+      <h3>React → Spring Boot</h3>
+      <table class="kv-table">
+        <tr><td>Protocol</td><td>HTTP/JSON over localhost</td></tr>
+        <tr><td>Proxy config</td><td>vite.config.ts /api → :8080</td></tr>
+        <tr><td>File upload</td><td>multipart/form-data POST</td></tr>
+        <tr><td>CORS</td><td>Spring allows :3000</td></tr>
+      </table>
+    </div>
+    <div class="card">
+      <h3>Spring Boot → CLIP server</h3>
+      <table class="kv-table">
+        <tr><td>Protocol</td><td>HTTP/JSON via WebClient</td></tr>
+        <tr><td>Request body</td><td>Base64-encoded image bytes</td></tr>
+        <tr><td>Response</td><td>float[] 768 dimensions</td></tr>
+        <tr><td>Timeout</td><td>10 s (CPU inference)</td></tr>
+      </table>
+    </div>
+    <div class="card">
+      <h3>Spring Boot → pgvector</h3>
+      <table class="kv-table">
+        <tr><td>Driver</td><td>pgvector-spring extension</td></tr>
+        <tr><td>ORM</td><td>Spring Data JPA + native @Query</td></tr>
+        <tr><td>Vector param</td><td>CAST(:vec AS vector)</td></tr>
+        <tr><td>Pool</td><td>HikariCP default settings</td></tr>
+      </table>
+    </div>
+    <div class="card">
+      <h3>Spring Boot → VLM server</h3>
+      <table class="kv-table">
+        <tr><td>Protocol</td><td>HTTP/JSON via WebClient</td></tr>
+        <tr><td>Request body</td><td>Base64 image + schema hint</td></tr>
+        <tr><td>Response</td><td>JSON attributes + confidences</td></tr>
+        <tr><td>Timeout</td><td>5 s (GPU) / 15 s (CPU)</td></tr>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     SECTION: OFFLINE PIPELINE
+═══════════════════════════════════════════ -->
+<div id="s-offline" class="section">
+  <div class="page-header">
+    <div class="eyebrow">Offline pipeline</div>
+    <h1>Catalog indexing</h1>
+    <div class="desc">Reads a local product catalog JSON, generates CLIP embeddings and style attributes (via the self-hosted fine-tuned VLM) for each product, and upserts both into pgvector. Triggered once at setup, or on-demand via REST. <strong>Note:</strong> in Phase 1, before the VLM is trained, this same job calls Claude to generate the silver labels that become the VLM's training set — see the Training &amp; distillation section.</div>
+  </div>
+
+  <div class="warn-bar">
+    <div class="bar-icon">⚠</div>
+    <div>The CLIP model takes 10–15 s to load on first call. Subsequent calls run in 3–6 s on CPU (Intel/AMD) or 0.5–1 s on Apple Silicon MPS. Indexing 50 products takes roughly 5–8 minutes on CPU. Run indexing once before the demo.</div>
+  </div>
+
+  <h2>Pipeline steps</h2>
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <div class="step-title">Load catalog from local JSON</div>
+        <div class="step-desc"><code>CatalogIndexService</code> reads <code>src/main/resources/catalog/products.json</code> from classpath. Each entry contains <code>id</code>, <code>name</code>, <code>category</code>, and <code>imagePath</code> (relative to <code>/tmp/wisteria-catalog/</code>). The <code>CommandLineRunner</code> bean activates only when the <code>index</code> Spring profile is active.</div>
+        <div class="step-tags"><span class="badge b-gray">products.json</span><span class="badge b-purple">CommandLineRunner</span><span class="badge b-gray">--spring.profiles.active=index</span></div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-body">
+        <div class="step-title">Read and normalize image bytes</div>
+        <div class="step-desc">Read raw image bytes from disk with <code>Files.readAllBytes()</code>. Apply EXIF orientation correction, scale the shorter edge to 336 and centre-crop to 336×336 using <code>java.awt.Graphics2D</code> (no external library; plain resize would stretch aspect ratio and distort silhouette signals). Encode to Base64 for HTTP transport. CLIP mean/std normalization happens exclusively inside the Python server's <code>preprocess</code> transform — Java must not attempt it.</div>
+        <div class="step-tags"><span class="badge b-gray">java.awt</span><span class="badge b-gray">336×336</span><span class="badge b-gray">Base64</span></div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-body">
+        <div class="step-title">Parallel: CLIP embedding + VLM attribute extraction</div>
+        <div class="step-desc">Two <code>CompletableFuture</code>s run in parallel using a virtual thread executor. (A) POST Base64 image to <code>localhost:5001/embed</code> — returns <code>float[768]</code>. (B) POST image to the VLM server at <code>localhost:5002/extract</code> — returns JSON with <code>finish</code>, <code>material</code>, <code>silhouette</code>, <code>era</code>, <code>palette</code>, <code>mood</code> plus per-field confidence. Both joined with <code>CompletableFuture.allOf()</code>. One retry on malformed VLM response; skip product on second failure.</div>
+        <div class="step-tags"><span class="badge b-teal">CLIP :5001</span><span class="badge b-coral">Qwen2.5-VL :5002</span><span class="badge b-purple">CompletableFuture.allOf()</span><span class="badge b-gray">virtual threads</span></div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">4</div>
+      <div class="step-body">
+        <div class="step-title">Upsert into pgvector</div>
+        <div class="step-desc">Spring Data JPA native query: <code>INSERT INTO product_embeddings ... ON CONFLICT (product_id) DO UPDATE SET embedding = EXCLUDED.embedding</code>. Separate upsert into <code>product_style_attributes</code>. Both wrapped in a single <code>@Transactional</code>. Also persist <code>model_ver</code> per row. HNSW handles incremental inserts natively — reindex (<code>REINDEX INDEX CONCURRENTLY product_embeddings_hnsw_idx</code>) only after a bulk re-embedding with a new CLIP model version, not after every run.</div>
+        <div class="step-tags"><span class="badge b-blue">pgvector</span><span class="badge b-purple">Spring Data JPA</span><span class="badge b-gray">ON CONFLICT DO UPDATE</span><span class="badge b-gray">HNSW reindex</span></div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">5</div>
+      <div class="step-body">
+        <div class="step-title">Log summary and expose status</div>
+        <div class="step-desc">Log total indexed, skipped, and elapsed time via <code>@Slf4j</code>. Write final status to <code>IndexJobStatus</code> singleton bean, exposed via <code>GET /api/v1/admin/index-status</code> so the React admin panel (or curl) can poll progress.</div>
+        <div class="step-tags"><span class="badge b-gray">Slf4j</span><span class="badge b-purple">GET /admin/index-status</span></div>
+      </div>
+    </div>
+  </div>
+
+  <h2>Python CLIP server</h2>
+  <pre><span class="c"># clip-server/main.py</span>
+<span class="k">from</span> fastapi <span class="k">import</span> FastAPI
+<span class="k">from</span> pydantic <span class="k">import</span> BaseModel
+<span class="k">import</span> open_clip, torch, base64
+<span class="k">from</span> PIL <span class="k">import</span> Image
+<span class="k">import</span> io
+
+app = FastAPI()
+model, _, preprocess = open_clip.create_model_and_transforms(
+    <span class="s">'ViT-L-14'</span>, pretrained=<span class="s">'openai'</span>
+)
+model.eval()
+<span class="c"># Use MPS on Apple Silicon for 5-10x speedup over CPU</span>
+device = <span class="s">"mps"</span> <span class="k">if</span> torch.backends.mps.is_available() <span class="k">else</span> <span class="s">"cpu"</span>
+model = model.to(device)
+
+<span class="k">class</span> <span class="t">EmbedRequest</span>(BaseModel):
+    image_b64: str
+
+@app.post(<span class="s">"/embed"</span>)
+<span class="k">def</span> embed(req: EmbedRequest):
+    img_bytes = base64.b64decode(req.image_b64)
+    img = Image.open(io.BytesIO(img_bytes)).convert(<span class="s">"RGB"</span>)
+    tensor = preprocess(img).unsqueeze(0).to(device)
+    <span class="k">with</span> torch.no_grad():
+        vec = model.encode_image(tensor)
+        vec = vec / vec.norm(dim=-1, keepdim=True)  <span class="c"># L2 normalise</span>
+    <span class="k">return</span> {<span class="s">"embedding"</span>: vec.squeeze().cpu().tolist()}
+
+@app.get(<span class="s">"/health"</span>)
+<span class="k">def</span> health():
+    <span class="k">return</span> {<span class="s">"status"</span>: <span class="s">"ok"</span>, <span class="s">"device"</span>: device}</pre>
+
+  <h2>Python VLM server (fine-tuned Qwen2.5-VL)</h2>
+  <pre><span class="c"># vlm-server/main.py — serves the LoRA-merged attribute extractor</span>
+<span class="k">from</span> fastapi <span class="k">import</span> FastAPI
+<span class="k">from</span> pydantic <span class="k">import</span> BaseModel
+<span class="k">from</span> transformers <span class="k">import</span> AutoModelForImageTextToText, AutoProcessor
+<span class="k">import</span> torch, base64, io, json
+<span class="k">from</span> PIL <span class="k">import</span> Image
+
+app = FastAPI()
+MODEL_DIR = <span class="s">"./adapter/qwen2.5-vl-7b-wisteria"</span>   <span class="c"># LoRA merged into base</span>
+MODEL_VER = <span class="s">"qwen2.5-vl-7b-wisteria-v1"</span>
+device = <span class="s">"cuda"</span> <span class="k">if</span> torch.cuda.is_available() <span class="k">else</span> <span class="s">"cpu"</span>
+
+model = AutoModelForImageTextToText.from_pretrained(
+    MODEL_DIR, torch_dtype=torch.bfloat16, device_map=device)
+processor = AutoProcessor.from_pretrained(MODEL_DIR)
+
+<span class="c"># Closed taxonomy — the model is constrained to these values</span>
+SCHEMA = <span class="s">"finish, material, silhouette, era, palette, mood"</span>
+PROMPT = (<span class="s">"Extract the interior-design style attributes as strict JSON "</span>
+          <span class="s">f"with exactly these keys: {SCHEMA}. Use only catalog vocabulary."</span>)
+
+<span class="k">class</span> <span class="t">ExtractRequest</span>(BaseModel):
+    image_b64: str
+
+@app.post(<span class="s">"/extract"</span>)
+<span class="k">def</span> extract(req: ExtractRequest):
+    img = Image.open(io.BytesIO(base64.b64decode(req.image_b64))).convert(<span class="s">"RGB"</span>)
+    msgs = [{<span class="s">"role"</span>: <span class="s">"user"</span>, <span class="s">"content"</span>: [
+        {<span class="s">"type"</span>: <span class="s">"image"</span>, <span class="s">"image"</span>: img},
+        {<span class="s">"type"</span>: <span class="s">"text"</span>, <span class="s">"text"</span>: PROMPT}]}]
+    inputs = processor.apply_chat_template(
+        msgs, add_generation_prompt=<span class="k">True</span>, tokenize=<span class="k">True</span>,
+        return_tensors=<span class="s">"pt"</span>).to(device)
+    <span class="k">with</span> torch.no_grad():
+        out = model.generate(**inputs, max_new_tokens=128, do_sample=<span class="k">False</span>)
+    text = processor.decode(out[0], skip_special_tokens=<span class="k">True</span>)
+    attrs = json.loads(text[text.index(<span class="s">"{"</span>):text.rindex(<span class="s">"}"</span>)+1])
+    <span class="k">return</span> {<span class="s">"attributes"</span>: attrs, <span class="s">"model_ver"</span>: MODEL_VER}
+
+@app.get(<span class="s">"/health"</span>)
+<span class="k">def</span> health():
+    <span class="k">return</span> {<span class="s">"status"</span>: <span class="s">"ok"</span>, <span class="s">"device"</span>: device, <span class="s">"model_ver"</span>: MODEL_VER}</pre>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     SECTION: ONLINE PIPELINE
+═══════════════════════════════════════════ -->
+<div id="s-online" class="section">
+  <div class="page-header">
+    <div class="eyebrow">Online pipeline</div>
+    <h1>Query — image upload to results</h1>
+    <div class="desc">Triggered per customer image upload. Orchestrated by <code>StyleQueryService</code> in Spring Boot. Target latency: dominated by CLIP CPU inference (~3–6 s). Cache hit bypasses pipeline entirely (&lt;80 ms).</div>
+  </div>
+
+  <h2>Latency budget (local POC)</h2>
+  <div class="card-grid g4" style="margin-bottom:20px">
+    <div class="metric"><div class="lbl">Redis pHash probe</div><div class="val">~5 ms</div><div class="sub">Cache hit returns here</div></div>
+    <div class="metric"><div class="lbl">CLIP embedding (CPU)</div><div class="val">3–6 s</div><div class="sub">Bottleneck on local machine</div></div>
+    <div class="metric"><div class="lbl">VLM extract (parallel)</div><div class="val">~0.2–1.5 s</div><div class="sub">GPU ~0.2–0.4 s; CPU slower</div></div>
+    <div class="metric"><div class="lbl">ANN search (50 products)</div><div class="val">&lt;10 ms</div><div class="sub">pgvector HNSW, small catalog</div></div>
+  </div>
+  <div class="card-grid g3" style="margin-bottom:24px">
+    <div class="metric"><div class="lbl">Re-ranking (in-memory)</div><div class="val">&lt;1 ms</div><div class="sub">Java stream over 50 candidates</div></div>
+    <div class="metric"><div class="lbl">Template explanation</div><div class="val">&lt;1 ms</div><div class="sub">Deterministic in-memory render</div></div>
+    <div class="metric"><div class="lbl">Total (cold)</div><div class="val">~3–7 s</div><div class="sub">GPU + CLIP-MPS: ~1–2 s</div></div>
+  </div>
+
+  <h2>Pipeline steps</h2>
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <div class="step-title">React uploads image → Spring Boot receives</div>
+        <div class="step-desc"><code>ImageUploader.tsx</code> posts a <code>FormData</code> with the selected file to <code>POST /api/v1/style/query</code>. Spring Boot's <code>@RequestParam MultipartFile image</code> receives it. File saved to <code>/tmp/wisteria-uploads/{UUID}.jpg</code>. Compute 64-bit pHash. Probe Redis: <code>redisTemplate.opsForValue().get("style:query:" + phashHex)</code>. Cache hit → return immediately.</div>
+        <div class="step-tags"><span class="badge b-purple">React FormData</span><span class="badge b-purple">MultipartFile</span><span class="badge b-amber">Redis pHash probe</span></div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-body">
+        <div class="step-title">Image pre-processing</div>
+        <div class="step-desc">Validate by magic bytes — never trust Content-Type or extension (JPEG/PNG/WebP only, else 415; &gt;10 MB rejected with 413 before buffering). Apply EXIF orientation correction (phone photos arrive rotated otherwise — a silent match-quality killer). Scale shorter edge to 336, centre-crop to 336×336 using <code>java.awt.Graphics2D</code>. Base64-encode. This encoded string is passed to both parallel calls in step 3.</div>
+        <div class="step-tags"><span class="badge b-gray">magic-byte validation</span><span class="badge b-gray">EXIF transpose</span><span class="badge b-gray">centre-crop 336×336</span><span class="badge b-gray">Base64</span></div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-body">
+        <div class="step-title">Parallel fan-out — CLIP embedding + attribute extraction</div>
+        <div class="step-desc">Two <code>CompletableFuture</code>s launched on a virtual thread executor. (A) <code>ClipEmbeddingService.embed(base64)</code> — POST to <code>localhost:5001/embed</code>, returns <code>float[768]</code>, 10 s timeout. (B) <code>AttributeExtractService.extract(base64)</code> — WebClient POST to the self-hosted VLM at <code>localhost:5002/extract</code>, returns the attribute map + confidences. Joined with <code>CompletableFuture.allOf(futA, futB).join()</code>.</div>
+        <div class="step-tags"><span class="badge b-teal">CLIP :5001 ~3–6 s</span><span class="badge b-coral">Qwen2.5-VL :5002 ~0.2–1.5 s</span><span class="badge b-purple">virtual thread executor</span></div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">4</div>
+      <div class="step-body">
+        <div class="step-title">ANN cosine search with optional attribute pre-filter</div>
+        <div class="step-desc">First execute <code>SET LOCAL hnsw.ef_search = 50</code> in the same transaction — pgvector's default <code>ef_search = 40</code> silently degrades recall when LIMIT exceeds it. Then the Spring Data JPA native query: <code>SELECT pe.product_id, (pe.embedding &lt;=&gt; CAST(:vec AS vector)) AS dist FROM product_embeddings pe ORDER BY dist ASC LIMIT 50</code>. If <code>era</code> or <code>material</code> attribute is selective (expected match rate &lt;20%), add a JOIN with <code>product_style_attributes</code> and a WHERE clause before the <code>&lt;=&gt;</code> operator to reduce search space. Returns 50 candidates with raw cosine distances.</div>
+        <div class="step-tags"><span class="badge b-blue">pgvector &lt;=&gt; cosine</span><span class="badge b-gray">top-50 candidates</span><span class="badge b-gray">optional attr pre-filter</span></div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">5</div>
+      <div class="step-body">
+        <div class="step-title">Weighted re-ranking (in-memory Java)</div>
+        <div class="step-desc">Java stream over 50 candidates: <code>score = 0.65 × (1 - cosineDist) + 0.35 × attributeOverlap</code>. <code>attributeOverlap</code> counts matching fields between query attributes and product attributes, normalised to 0–1 over 6 fields. Sort descending, take top 8. Entirely in-memory — no additional DB round-trip. If the best final score is below 0.45, set <code>low_confidence: true</code> in the response so the UI frames results as "closest matches we found" rather than implying strong matches.</div>
+        <div class="step-tags"><span class="badge b-green">α=0.65 cosine + β=0.35 attribute</span><span class="badge b-gray">top-8 selected</span></div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">6</div>
+      <div class="step-body">
+        <div class="step-title">Template explanation assembly (deterministic, in-memory)</div>
+        <div class="step-desc">For each of the 8 results, <code>ExplanationService</code> renders a 1–2 sentence explanation from the overlap between query attributes and product attributes — no model call. A slotted template selects phrasing by which fields matched, e.g. <em>"Shares your inspiration's {era} aesthetic through its {material} {finish} finish and {palette} palette."</em> Empty slots are dropped gracefully so sparse matches still read naturally. Because it is a pure function of the matched data, output is consistent and effectively instant. Open-ended reasoning is out of scope here and is handled by the optional <code>/style/chat</code> endpoint.</div>
+        <div class="step-tags"><span class="badge b-purple">template engine</span><span class="badge b-green">deterministic</span><span class="badge b-gray">&lt;1 ms</span></div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">7</div>
+      <div class="step-body">
+        <div class="step-title">Assemble response, cache, return</div>
+        <div class="step-desc">Build <code>StyleQueryResponse</code> POJO. Normalise cosine distance: <code>score = Math.round((1 - cosineDist) * 100)</code>. Serialise to JSON. Write to Redis under <code>style:query:{phashHex}</code> with TTL 3600 s. Log query to <code>style_query_log</code> table. Return 200 JSON to React.</div>
+        <div class="step-tags"><span class="badge b-amber">Redis write TTL 1 h</span><span class="badge b-gray">score 0–100</span><span class="badge b-blue">query log to pgvector</span></div>
+      </div>
+    </div>
+  </div>
+
+  <h2>Key Spring Boot snippet — orchestration</h2>
+  <pre><span class="c">// StyleQueryService.java (simplified)</span>
+<span class="k">var</span> executor = Executors.newVirtualThreadPerTaskExecutor();
+
+<span class="k">var</span> embFuture  = CompletableFuture.supplyAsync(
+    () -> clipService.embed(base64Image), executor);
+<span class="k">var</span> attrFuture = CompletableFuture.supplyAsync(
+    () -> attributeService.extract(base64Image), executor);  <span class="c">// VLM :5002</span>
+
+CompletableFuture.allOf(embFuture, attrFuture).join();
+
+<span class="k">float</span>[] queryVector = embFuture.get();
+<span class="t">StyleAttributes</span> queryAttrs = attrFuture.get();
+
+<span class="c">// ANN search + re-rank</span>
+<span class="k">var</span> candidates = embeddingRepo.findTopN(queryVector, 50);
+<span class="k">var</span> ranked = reRankingService.rank(candidates, queryAttrs, 8);
+
+<span class="c">// Deterministic template explanations — synchronous, no API, never fails</span>
+<span class="k">var</span> explanationMap = explanationService.render(queryAttrs, ranked);</pre>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     SECTION: PROJECT STRUCTURE
+═══════════════════════════════════════════ -->
+<div id="s-structure" class="section">
+  <div class="page-header">
+    <div class="eyebrow">Implementation</div>
+    <h1>Project structure</h1>
+    <div class="desc">Three modules in a single monorepo root, started independently. Docker Compose manages the infrastructure services.</div>
+  </div>
+
+  <div class="card-grid g2">
+    <div class="card">
+      <h3>Spring Boot — <code>wisteria-api/</code></h3>
+      <div class="filetree">
+<span class="dir">src/main/java/com/wisteria/</span>
+  <span class="dir">controller/</span>
+    <span class="file">  StyleQueryController.java</span>      <span class="comment">  ← POST /api/v1/style/query</span>
+    <span class="file">  AdminController.java</span>           <span class="comment">  ← indexing trigger + status</span>
+  <span class="dir">service/</span>
+    <span class="file">  StyleQueryService.java</span>         <span class="comment">  ← orchestrates full pipeline</span>
+    <span class="file">  CatalogIndexService.java</span>       <span class="comment">  ← offline batch runner</span>
+    <span class="file">  ClipEmbeddingService.java</span>      <span class="comment">  ← WebClient → :5001/embed</span>
+    <span class="file">  AttributeExtractService.java</span>   <span class="comment">  ← WebClient → VLM :5002/extract</span>
+    <span class="file">  ReRankingService.java</span>          <span class="comment">  ← weighted score logic</span>
+    <span class="file">  ExplanationService.java</span>        <span class="comment">  ← deterministic template render</span>
+    <span class="file">  ChatService.java</span>               <span class="comment">  ← optional LLM, /style/chat only</span>
+    <span class="file">  CacheService.java</span>              <span class="comment">  ← Redis read/write</span>
+  <span class="dir">repository/</span>
+    <span class="file">  ProductEmbeddingRepository.java</span> <span class="comment"> ← @Query native pgvector</span>
+    <span class="file">  StyleAttributeRepository.java</span>
+    <span class="file">  QueryLogRepository.java</span>
+  <span class="dir">model/</span>
+    <span class="file">  ProductEmbedding.java</span>
+    <span class="file">  StyleAttribute.java</span>
+    <span class="file">  StyleQueryResponse.java</span>
+    <span class="file">  ResultItem.java</span>
+  <span class="dir">config/</span>
+    <span class="file">  WebClientConfig.java</span>           <span class="comment">  ← timeouts for CLIP + VLM</span>
+    <span class="file">  CorsConfig.java</span>                <span class="comment">  ← allow :3000</span>
+    <span class="file">  RedisConfig.java</span>
+    <span class="file">  VlmClientConfig.java</span>           <span class="comment">  ← base URL :5002, retry</span>
+    <span class="file">  AnthropicConfig.java</span>           <span class="comment">  ← optional: chat + offline labeling</span>
+<span class="dir">src/main/resources/</span>
+  <span class="file">  application.yml</span>
+  <span class="dir">  catalog/</span>
+    <span class="file">    products.json</span>               <span class="comment">  ← 20-50 POC products</span>
+  <span class="dir">  db/migration/</span>
+    <span class="file">    V1__init_schema.sql</span>         <span class="comment">  ← Flyway, creates all tables</span>
+      </div>
+    </div>
+    <div>
+      <div class="card" style="margin-bottom:12px">
+        <h3>React — <code>wisteria-ui/</code></h3>
+        <div class="filetree">
+<span class="dir">src/</span>
+  <span class="dir">components/</span>
+    <span class="file">  ImageUploader.tsx</span>    <span class="comment"> ← drag-drop, preview, submit</span>
+    <span class="file">  ResultsGrid.tsx</span>      <span class="comment"> ← 2-4 col product grid</span>
+    <span class="file">  ProductCard.tsx</span>      <span class="comment"> ← image, name, score, why</span>
+    <span class="file">  SimilarityBadge.tsx</span>  <span class="comment"> ← 0-100 score pill</span>
+    <span class="file">  AttributePills.tsx</span>   <span class="comment"> ← detected style DNA</span>
+    <span class="file">  LoadingState.tsx</span>
+  <span class="dir">hooks/</span>
+    <span class="file">  useStyleQuery.ts</span>     <span class="comment"> ← loading/error/results state</span>
+  <span class="dir">api/</span>
+    <span class="file">  styleApi.ts</span>          <span class="comment"> ← fetch wrapper</span>
+  <span class="dir">types/</span>
+    <span class="file">  index.ts</span>             <span class="comment"> ← StyleQueryResponse types</span>
+  <span class="file">  App.tsx</span>
+  <span class="file">  main.tsx</span>
+<span class="file">vite.config.ts</span>             <span class="comment"> ← proxy /api → :8080</span>
+<span class="file">tailwind.config.ts</span>
+        </div>
+      </div>
+      <div class="card">
+        <h3>Python CLIP — <code>clip-server/</code></h3>
+        <div class="filetree">
+<span class="file">main.py</span>          <span class="comment"> ← FastAPI app (see offline tab)</span>
+<span class="file">requirements.txt</span> <span class="comment"> ← open_clip_torch, fastapi, pillow</span>
+<span class="file">Dockerfile</span>       <span class="comment"> ← python:3.11-slim base</span>
+        </div>
+        <h3 style="margin-top:14px">Python VLM — <code>vlm-server/</code></h3>
+        <div class="filetree">
+<span class="file">main.py</span>          <span class="comment"> ← FastAPI /extract (Qwen2.5-VL)</span>
+<span class="dir">adapter/</span>         <span class="comment"> ← LoRA-merged fine-tuned weights</span>
+<span class="file">requirements.txt</span> <span class="comment"> ← transformers, accelerate, vllm</span>
+<span class="file">Dockerfile</span>       <span class="comment"> ← CUDA base; CPU fallback</span>
+        </div>
+        <h3 style="margin-top:14px">Training — <code>training/</code></h3>
+        <div class="filetree">
+<span class="file">label_with_claude.py</span> <span class="comment"> ← Phase 1 silver labels (Sonnet 4.6 teacher)</span>
+<span class="file">train_lora.py</span>        <span class="comment"> ← PEFT/LoRA fine-tune</span>
+<span class="file">eval_golden.py</span>       <span class="comment"> ← per-attribute accuracy</span>
+        </div>
+        <div class="warn-bar">
+          <div class="bar-icon">⚠</div>
+          <div><strong><code>label_with_claude.py</code> teacher-call settings.</strong> Call <code>claude-sonnet-4-6</code> in <strong>standard mode</strong>: do <em>not</em> enable Extended Thinking (no <code>thinking: {type:"enabled"}</code>), and do <em>not</em> send <code>temperature</code>, <code>top_p</code>, or <code>top_k</code>. On Claude 4.x these are a breaking change — passing them with thinking enabled returns <strong>HTTP 400</strong>; forced tool use already pins the output, so leaving sampling at defaults also keeps labels reproducible. Record the model ID and token spend for the retraining budget.</div>
+        </div>
+        <h3 style="margin-top:14px">Root</h3>
+        <div class="filetree">
+<span class="file">docker-compose.yml</span>   <span class="comment"> ← postgres, redis, clip, vlm</span>
+<span class="file">.env.example</span>         <span class="comment"> ← ANTHROPIC_API_KEY (optional)</span>
+<span class="file">README.md</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <h2>Key Spring Boot class responsibilities</h2>
+  <div class="card-grid g2">
+    <div class="card">
+      <h3><code>StyleQueryController</code></h3>
+      <table class="kv-table">
+        <tr><td>POST /api/v1/style/query</td><td>MultipartFile → pipeline</td></tr>
+        <tr><td>GET /api/v1/style/health</td><td>ping CLIP, pgvector, Redis</td></tr>
+        <tr><td>@CrossOrigin</td><td>localhost:3000</td></tr>
+      </table>
+    </div>
+    <div class="card">
+      <h3><code>ClipEmbeddingService</code></h3>
+      <table class="kv-table">
+        <tr><td>WebClient POST</td><td>localhost:5001/embed</td></tr>
+        <tr><td>Timeout</td><td>10 s (CPU inference)</td></tr>
+        <tr><td>Returns</td><td>float[] (768 dims)</td></tr>
+      </table>
+    </div>
+    <div class="card">
+      <h3><code>ProductEmbeddingRepository</code></h3>
+      <table class="kv-table">
+        <tr><td>Extends</td><td>JpaRepository</td></div>
+        <tr><td>@Query (native)</td><td>pgvector &lt;=&gt; cosine ANN</td></tr>
+        <tr><td>Dep</td><td>com.pgvector:pgvector-spring</td></tr>
+      </table>
+    </div>
+    <div class="card">
+      <h3><code>useStyleQuery.ts</code> (React)</h3>
+      <table class="kv-table">
+        <tr><td>State</td><td>loading, error, results, queryAttrs</td></tr>
+        <tr><td>Exposes</td><td>submitImage(file: File)</td></tr>
+        <tr><td>Calls</td><td>styleApi.ts fetch wrapper</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <h2><code>vite.config.ts</code> proxy</h2>
+  <pre><span class="k">export default</span> defineConfig({
+  plugins: [react()],
+  server: {
+    proxy: {
+      <span class="s">'/api'</span>: {
+        target: <span class="s">'http://localhost:8080'</span>,
+        changeOrigin: <span class="k">true</span>,
+      },
+    },
+  },
+})</pre>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     SECTION: DATA MODELS
+═══════════════════════════════════════════ -->
+<div id="s-data" class="section">
+  <div class="page-header">
+    <div class="eyebrow">Implementation</div>
+    <h1>Data models</h1>
+    <div class="desc">Three PostgreSQL tables. <code>product_embeddings</code> carries the CLIP vector column. <code>product_style_attributes</code> stores the VLM-extracted style fields with per-field confidence. <code>style_query_log</code> records each query for analytics and debugging.</div>
+  </div>
+
+  <h2>Flyway migration — V1__init_schema.sql</h2>
+  <pre><span class="t">CREATE</span> EXTENSION <span class="k">IF NOT EXISTS</span> vector;
+
+<span class="t">CREATE TABLE</span> product_embeddings (
+    product_id  <span class="t">UUID</span>           <span class="k">PRIMARY KEY</span>,
+    name        <span class="t">VARCHAR</span>(255),
+    category    <span class="t">VARCHAR</span>(100),
+    image_path  <span class="t">VARCHAR</span>(512),
+    embedding   <span class="t">vector</span>(768),     <span class="c">-- CLIP ViT-L/14 output</span>
+    model_ver   <span class="t">VARCHAR</span>(64),     <span class="c">-- must match between index + query</span>
+    indexed_at  <span class="t">TIMESTAMPTZ</span>    <span class="k">DEFAULT</span> now()
+);
+
+<span class="t">CREATE INDEX</span> product_embeddings_hnsw_idx
+    <span class="k">ON</span> product_embeddings
+    <span class="k">USING</span> hnsw (embedding vector_cosine_ops)
+    <span class="k">WITH</span> (m = 16, ef_construction = 64);
+
+<span class="t">CREATE TABLE</span> product_style_attributes (
+    product_id  <span class="t">UUID</span>           <span class="k">PRIMARY KEY REFERENCES</span> product_embeddings,
+    finish      <span class="t">VARCHAR</span>(64),    <span class="c">-- matte | gloss | brushed | aged | lacquered</span>
+    material    <span class="t">VARCHAR</span>(64),    <span class="c">-- oak | velvet | brass | linen | marble | rattan</span>
+    silhouette  <span class="t">VARCHAR</span>(64),    <span class="c">-- clean-line | curved | ornate | sculptural | minimal</span>
+    era         <span class="t">VARCHAR</span>(64),    <span class="c">-- mid-century | Art Deco | Japandi | contemporary</span>
+    palette     <span class="t">VARCHAR</span>(64),    <span class="c">-- warm-neutral | cool-neutral | earthy | monochrome</span>
+    mood        <span class="t">VARCHAR</span>(64),    <span class="c">-- cosy | editorial | calm | dramatic | playful</span>
+    confidence  <span class="t">JSONB</span>,          <span class="c">-- per-field softmax confidence from the VLM</span>
+    model_ver   <span class="t">VARCHAR</span>(64),    <span class="c">-- VLM version; guard on mismatch (see NFR)</span>
+    raw_json    <span class="t">TEXT</span>,           <span class="c">-- full VLM response for future fields</span>
+    indexed_at  <span class="t">TIMESTAMPTZ</span>    <span class="k">DEFAULT</span> now()
+);
+
+<span class="t">CREATE TABLE</span> style_query_log (
+    query_id    <span class="t">UUID</span>           <span class="k">PRIMARY KEY</span>,
+    phash       <span class="t">BIGINT</span>,
+    latency_ms  <span class="t">INTEGER</span>,
+    cache_hit   <span class="t">BOOLEAN</span>,
+    created_at  <span class="t">TIMESTAMPTZ</span>    <span class="k">DEFAULT</span> now()
+);</pre>
+
+  <h2>Redis cache schema</h2>
+  <div class="card-grid g2">
+    <div class="card">
+      <table class="kv-table">
+        <tr><td>Key format</td><td>style:query:{phash_hex_64}</td></tr>
+        <tr><td>Value</td><td>Serialised JSON (full API response)</td></tr>
+        <tr><td>TTL</td><td>3600 seconds (1 hour)</td></tr>
+        <tr><td>Eviction policy</td><td>allkeys-lru</td></tr>
+      </table>
+    </div>
+    <div class="card">
+      <table class="kv-table">
+        <tr><td>Max memory (POC)</td><td>256 MB</td></tr>
+        <tr><td>Avg entry size</td><td>~10 KB per cached result</td></tr>
+        <tr><td>Effective capacity</td><td>~25 K cached queries</td></tr>
+        <tr><td>pHash collision risk</td><td>Negligible at POC scale</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <h2>JPA entity — <code>ProductEmbedding.java</code></h2>
+  <pre><span class="k">@Entity</span>
+<span class="k">@Table</span>(name = <span class="s">"product_embeddings"</span>)
+<span class="k">public class</span> <span class="t">ProductEmbedding</span> {
+    <span class="k">@Id</span> <span class="k">private</span> UUID productId;
+    <span class="k">private</span> String name;
+    <span class="k">private</span> String category;
+    <span class="k">private</span> String imagePath;
+
+    <span class="c">// pgvector-spring maps vector(768) ↔ float[]</span>
+    <span class="k">@Column</span>(columnDefinition = <span class="s">"vector(768)"</span>)
+    <span class="k">private float</span>[] embedding;
+}
+
+<span class="c">// Repository</span>
+<span class="k">public interface</span> <span class="t">ProductEmbeddingRepository</span>
+        <span class="k">extends</span> JpaRepository&lt;ProductEmbedding, UUID&gt; {
+
+    <span class="k">@Query</span>(value = <span class="s">"""
+        SELECT pe.product_id, pe.name, pe.image_path,
+               (pe.embedding &lt;=&gt; CAST(:vec AS vector)) AS dist
+        FROM product_embeddings pe
+        ORDER BY dist ASC LIMIT :limit
+        """</span>, nativeQuery = <span class="k">true</span>)
+    List&lt;Object[]&gt; findTopN(<span class="k">@Param</span>(<span class="s">"vec"</span>) String vec,
+                            <span class="k">@Param</span>(<span class="s">"limit"</span>) <span class="k">int</span> limit);
+}</pre>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     SECTION: API CONTRACT
+═══════════════════════════════════════════ -->
+<div id="s-api" class="section">
+  <div class="page-header">
+    <div class="eyebrow">Implementation</div>
+    <h1>API contract</h1>
+    <div class="desc">All endpoints are under <code>/api/v1/</code>. The shape is production-ready — no changes needed when moving off local disk to S3 or SageMaker.</div>
+  </div>
+
+  <h2>Endpoints</h2>
+  <div class="endpoint">
+    <span class="method method-post">POST</span>
+    <div><div class="path">/api/v1/style/query</div><div class="desc">Submit inspiration image. Returns top-K matched products with similarity scores and explanations. <code>Content-Type: multipart/form-data</code>.</div></div>
+  </div>
+  <div class="endpoint">
+    <span class="method method-get">GET</span>
+    <div><div class="path">/api/v1/style/health</div><div class="desc">Returns JSON health status of CLIP server, VLM server, pgvector, and Redis. Use at startup to verify all dependencies are reachable.</div></div>
+  </div>
+  <div class="endpoint">
+    <span class="method method-post">POST</span>
+    <div><div class="path">/api/v1/style/chat</div><div class="desc"><span class="badge b-gray">Optional</span> Conversational reasoning over a result set ("which of these would brighten a dark room?"). Routes to an LLM (Claude or self-hosted). The only endpoint that touches an LLM; disabled by default.</div></div>
+  </div>
+  <div class="endpoint">
+    <span class="method method-post">POST</span>
+    <div><div class="path">/api/v1/admin/index</div><div class="desc">Trigger catalog indexing. Returns 202 Accepted. Poll <code>GET /admin/index-status</code> for progress.</div></div>
+  </div>
+  <div class="endpoint">
+    <span class="method method-get">GET</span>
+    <div><div class="path">/api/v1/admin/index-status</div><div class="desc">Returns indexing job state: <code>total</code>, <code>indexed</code>, <code>skipped</code>, <code>elapsedMs</code>, <code>status</code> (IDLE / RUNNING / DONE / FAILED).</div></div>
+  </div>
+
+  <h2>POST /query — request</h2>
+  <table class="schema-table">
+    <thead><tr><th>Field</th><th>Type</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td class="fn-col">image</td><td class="ft-col">binary</td><td class="fd-col">JPEG / PNG / WebP, max 10 MB. Sent as multipart.</td></tr>
+      <tr><td class="fn-col">top_k</td><td class="ft-col">integer</td><td class="fd-col">Optional. Default 8, max 20.</td></tr>
+      <tr><td class="fn-col">filter_era</td><td class="ft-col">string</td><td class="fd-col">Optional. Pre-filter by era attribute before ANN search.</td></tr>
+      <tr><td class="fn-col">filter_material</td><td class="ft-col">string</td><td class="fd-col">Optional. Pre-filter by material attribute before ANN search.</td></tr>
+    </tbody>
+  </table>
+
+  <h2>POST /query — response (200 OK)</h2>
+  <table class="schema-table">
+    <thead><tr><th>Field</th><th>Type</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td class="fn-col">query_id</td><td class="ft-col">UUID</td><td class="fd-col">Generated per request. Use for feedback and log correlation.</td></tr>
+      <tr><td class="fn-col">cache_hit</td><td class="ft-col">boolean</td><td class="fd-col">True if served from Redis cache.</td></tr>
+      <tr><td class="fn-col">latency_ms</td><td class="ft-col">int</td><td class="fd-col">Server-side pipeline time in milliseconds.</td></tr>
+      <tr><td class="fn-col">query_attributes</td><td class="ft-col">object</td><td class="fd-col">Style DNA extracted from the uploaded image.</td></tr>
+      <tr><td class="fn-col">results</td><td class="ft-col">array</td><td class="fd-col">Ordered array of top-K matched products.</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Result item</h2>
+  <table class="schema-table">
+    <thead><tr><th>Field</th><th>Type</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td class="fn-col">product_id</td><td class="ft-col">UUID</td><td class="fd-col">From catalog JSON.</td></tr>
+      <tr><td class="fn-col">name</td><td class="ft-col">string</td><td class="fd-col">Product display name.</td></tr>
+      <tr><td class="fn-col">image_url</td><td class="ft-col">string</td><td class="fd-col"><code>/static/catalog/{filename}</code> served by Spring Boot.</td></tr>
+      <tr><td class="fn-col">similarity_score</td><td class="ft-col">integer</td><td class="fd-col">0–100. Normalised weighted cosine + attribute score.</td></tr>
+      <tr><td class="fn-col">why_matches</td><td class="ft-col">string</td><td class="fd-col">1–2 sentence explanation rendered deterministically from matched attributes.</td></tr>
+      <tr><td class="fn-col">matched_attributes</td><td class="ft-col">object</td><td class="fd-col">Key-value of overlapping style fields.</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Query attributes object</h2>
+  <table class="schema-table">
+    <thead><tr><th>Field</th><th>Values (examples)</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td class="fn-col">finish</td><td class="ft-col">matte | gloss | brushed | aged | lacquered</td><td class="fd-col">Surface treatment visible in image</td></tr>
+      <tr><td class="fn-col">material</td><td class="ft-col">oak | velvet | brass | linen | marble | rattan</td><td class="fd-col">Dominant material</td></tr>
+      <tr><td class="fn-col">silhouette</td><td class="ft-col">clean-line | curved | ornate | sculptural | minimal</td><td class="fd-col">Shape language</td></tr>
+      <tr><td class="fn-col">era</td><td class="ft-col">mid-century | Art Deco | Japandi | contemporary</td><td class="fd-col">Design era / style period</td></tr>
+      <tr><td class="fn-col">palette</td><td class="ft-col">warm-neutral | cool-neutral | earthy | monochrome | bold</td><td class="fd-col">Dominant color family</td></tr>
+      <tr><td class="fn-col">mood</td><td class="ft-col">cosy | editorial | calm | dramatic | playful</td><td class="fd-col">Overall aesthetic mood</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     SECTION: TRAINING & DISTILLATION
+═══════════════════════════════════════════ -->
+<div id="s-training" class="section">
+  <div class="page-header">
+    <div class="eyebrow">Model Layer</div>
+    <h1>Training & distillation</h1>
+    <div class="desc">The path from v2.1 (Claude Vision) to v3.0 (fine-tuned Qwen2.5-VL) is a three-phase ladder. Claude is the teacher; the VLM is the student. Investment is front-loaded (Phase 1–2); payoff is perpetual (Phase 3 onward).</div>
+    <div class="badge-row">
+      <span class="badge b-coral">Phase 1 — Distillation</span>
+      <span class="badge b-purple">Phase 2 — Fine-tune</span>
+      <span class="badge b-teal">Phase 3 — Production</span>
+    </div>
+  </div>
+
+  <h2>The three-phase roadmap</h2>
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <div class="step-title">Phase 1 — Distillation (one week)</div>
+        <div class="step-desc"><strong>Goal:</strong> Build a labeled training dataset by running your catalog + a sampling of real query images through <strong>Claude Sonnet 4.6 (or higher) as the teacher model</strong>. Sonnet's stronger steerability and tool-use adherence keep every label inside the closed attribute vocabulary — that fidelity is what makes a silver set clean enough to distill from. This produces a <em>silver set</em> of 5k–10k labeled images. <strong>Inputs:</strong> your products.json, 20–50 query images from users/demos. <strong>Process:</strong> <code>training/label_with_claude.py</code> posts each image to the teacher with forced tool use via the <strong>Anthropic Batch API</strong> (50% discount vs. real-time calls) and parses the extracted attributes into a JSONL training file. <strong>Output:</strong> <code>wisteria_train_silver.jsonl</code> (5k–10k rows). <strong>Cost:</strong> ~$1–2 per 500 images via Batch API; ~$9–10 for a full 5k-image set (vs. ~$15–30 at real-time pricing). As-built: 462 images cost ~$1.80 total. <strong>Quality gate:</strong> have domain experts hand-review a 5% sample and flag any obvious errors (e.g. "leather" labeled as "fabric"). Acceptable error rate: &lt;5% across your taxonomy.</div>
+        <div class="step-tags"><span class="badge b-coral">Claude Sonnet 4.6 — Teacher Model</span><span class="badge b-gray">Anthropic Batch API (50% off)</span><span class="badge b-green">~$9–10 / 5k images</span></div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-body">
+        <div class="step-title">Phase 2 — LoRA fine-tune (one week)</div>
+        <div class="step-desc"><strong>Goal:</strong> Fine-tune a base Qwen2.5-VL-7B on your silver set using parameter-efficient PEFT/LoRA. This trains only the adapter weights (~5% of model), leaving the backbone frozen. <strong>Process:</strong> <code>training/train_lora.py</code> runs on your GPU (RTX 4090, 1×24GB) or cloud compute. 5k images, 3 epochs, mixed-precision training (bfloat16) takes ~2–4 hours. <strong>Output:</strong> merged LoRA checkpoint saved to <code>vlm-server/adapter/qwen2.5-vl-7b-wisteria-v1/</code>. <strong>Eval:</strong> Run <code>training/eval_golden.py</code> on a hand-reviewed golden set of 200–500 images (Yogesh's team labels these in parallel with Phase 1). Measure per-attribute accuracy. <strong>Gate:</strong> Material, finish, era, palette must each reach ≥85% accuracy. If not, iterate the training (higher LR, more epochs, or better data curation).</div>
+        <div class="step-tags"><span class="badge b-purple">PEFT LoRA</span><span class="badge b-gray">2–4 hrs GPU</span><span class="badge b-green">~$5–20 (cloud)</span><span class="badge b-amber">per-attr eval</span></div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-body">
+        <div class="step-title">Phase 3 — Production cutover</div>
+        <div class="step-desc"><strong>At gate:</strong> Phase 2 eval ≥85% per-attribute accuracy, golden-set precision@8 (search + re-rank + template) ≥60%. <strong>Cutover steps:</strong> (1) Merge the LoRA adapter into the base Qwen2.5-VL checkpoint (one-liner via transformers CLI). (2) Copy the merged checkpoint to <code>vlm-server/adapter/qwen2.5-vl-7b-wisteria-v1/</code>. (3) Restart <code>vlm-server</code> container. (4) Re-index the catalog with the new VLM (<code>CatalogIndexService</code> detects the <code>model_ver</code> change and runs full extraction). (5) A/B test the old indexing against the new — verify latency, match quality, and downstream metrics (click-through, conversion). (6) Sunset the Claude Vision calls in production (keep the <code>ANTHROPIC_API_KEY</code> only for the optional <code>/style/chat</code> endpoint). <strong>Ongoing:</strong> log low-confidence extractions (the <code>confidence</code> JSONB from the VLM) and roll them into a monthly re-training pipeline.</div>
+        <div class="step-tags"><span class="badge b-teal">LoRA merge</span><span class="badge b-teal">model cutover</span><span class="badge b-teal">re-index</span><span class="badge b-green">A/B test</span></div>
+      </div>
+    </div>
+  </div>
+
+  <h2>Dataset specifications</h2>
+  <div class="card-grid g2">
+    <div class="card">
+      <h3>Phase 1 silver set (5k–10k images)</h3>
+      <p><strong>Source:</strong> 100% of your catalog products + a sampling of real query inspiration images. <strong>Format:</strong> one JSONL per image: <code>{"image_b64": "...", "finish": "matte", "material": "oak", ...}</code>. <strong>Labels:</strong> generated by Claude Sonnet 4.6 (forced tool use, one call per image). <strong>Quality:</strong> silver = Claude's output as-is. No human review except a 5% sample check for obvious errors. <strong>Size:</strong> 5k images is solid for 80%+ accuracy; 10k is ideal for ≥85%.</p>
+    </div>
+    <div class="card">
+      <h3>Phase 2 golden set (200–500 images)</h3>
+      <p><strong>Source:</strong> A balanced stratified sample from Phase 1 (overrepresent rare eras / materials). <strong>Labels:</strong> 100% hand-reviewed and corrected by domain experts (Yogesh's team or interior designers). <strong>Format:</strong> same JSONL, but each label is authoritative. <strong>Splits:</strong> 70% train (reused from silver, but corrected), 30% eval (held-out golden set). <strong>Use:</strong> train/eval gold to compute per-attribute accuracy. If accuracy &lt;85%, curate a smaller 1k-image "hard negative" set (edge cases) and re-train.</p>
+    </div>
+  </div>
+
+  <h2>Training code sketch</h2>
+  <pre><span class="c"># training/train_lora.py — simplified LoRA fine-tune</span>
+<span class="k">from</span> peft <span class="k">import</span> get_peft_model, LoraConfig, TaskType
+<span class="k">from</span> transformers <span class="k">import</span> AutoModelForVision2Seq, AutoProcessor, Trainer, TrainingArguments
+<span class="k">from</span> datasets <span class="k">import</span> load_dataset
+<span class="k">import</span> torch
+
+<span class="c"># Load base model + processor</span>
+model = AutoModelForVision2Seq.from_pretrained(
+    <span class="s">"Qwen/Qwen2.5-VL-7B-Instruct"</span>, torch_dtype=torch.bfloat16, device_map=<span class="s">"auto"</span>)
+processor = AutoProcessor.from_pretrained(<span class="s">"Qwen/Qwen2.5-VL-7B-Instruct"</span>)
+
+<span class="c"># LoRA config</span>
+peft_cfg = LoraConfig(task_type=TaskType.CAUSAL_LM, r=64, lora_alpha=128, lora_dropout=0.05,
+    target_modules=[<span class="s">"q_proj"</span>, <span class="s">"v_proj"</span>])
+model = get_peft_model(model, peft_cfg)
+
+<span class="c"># Load silver set</span>
+train_ds = load_dataset(<span class="s">"json"</span>, data_files=<span class="s">"wisteria_train_silver.jsonl"</span>)[<span class="s">"train"</span>]
+
+<span class="c"># Training</span>
+trainer = Trainer(
+    model=model, args=TrainingArguments(
+        output_dir=<span class="s">"./checkpoints"</span>, num_train_epochs=3, per_device_train_batch_size=4,
+        learning_rate=2e-4, bf16=<span class="k">True</span>),
+    train_dataset=train_ds)
+trainer.train()
+
+<span class="c"># Merge &amp; save</span>
+model = model.merge_and_unload()
+model.save_pretrained(<span class="s">"./vlm-server/adapter/qwen2.5-vl-7b-wisteria-v1"</span>)</pre>
+
+  <h2>When to retrain</h2>
+  <table class="map-table">
+    <tbody>
+      <tr><td>Monthly re-training (recommended)</td><td>Sample 500 low-confidence extractions from the <code>style_query_log</code>, have domain experts correct them, append to the training set, and run a 1-epoch fine-tune. Merge and roll out Friday evening.</td></tr>
+      <tr><td>Major catalog update</td><td>New product category (e.g., outdoor / garden) enters the catalog. Curate 200–300 labeled images from that category, add to training set, re-train with 2–3 epochs.</td></tr>
+      <tr><td>Model drift detected</td><td>If golden-set precision@8 drops &gt;10% over a quarter, or per-attribute accuracy on a held-out monthly sample drops &lt;80%, trigger an urgent re-training cycle.</td></tr>
+      <tr><td>New base model release</td><td>Qwen2.5-VL-8B or Qwen3-VL released with better performance. Download the new base, apply the same LoRA config, initialize from the old checkpoint (transfer learning), fine-tune 1–2 epochs on the golden set to warm-start.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="doc-footer">
+    <span>Training & distillation · Model layer setup</span>
+    <span>PEFT · LoRA · per-attribute eval</span>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     SECTION: SETUP GUIDE
+═══════════════════════════════════════════ -->
+<div id="s-setup" class="section">
+  <div class="page-header">
+    <div class="eyebrow">Operations</div>
+    <h1>Local setup guide</h1>
+    <div class="desc">From zero to a running POC. Follow steps in order. Total time: ~20 minutes on first run (most time is CLIP model download ~1.7 GB).</div>
+  </div>
+
+  <h2>Prerequisites</h2>
+  <div class="card-grid g4">
+    <div class="card"><h3>Java 21</h3><p>Required for virtual threads. Use SDKMAN: <code>sdk install java 21-tem</code></p></div>
+    <div class="card"><h3>Docker Desktop</h3><p>Allocate at least 8 GB RAM. Runs postgres, redis, clip-server, and vlm-server.</p></div>
+    <div class="card"><h3>Node.js 20+</h3><p>For the React / Vite dev server. Check: <code>node --version</code></p></div>
+    <div class="card"><h3>GPU (recommended)</h3><p>One 24 GB GPU runs Qwen2.5-VL-7B comfortably. CPU works but extraction is slow. Florence-2 needs far less.</p></div>
+  </div>
+  <div class="info-bar" style="margin-top:12px;">
+    <div class="bar-icon">✓</div>
+    <div>An <strong>Anthropic API key is optional</strong> in v3.0 — needed only for the Phase 1 labeling pass (<code>training/label_with_claude.py</code>) and the optional <code>/style/chat</code> endpoint. The per-query path needs no external key.</div>
+  </div>
+
+  <h2>Step-by-step</h2>
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <div class="step-title">Create environment file</div>
+        <pre>cp .env.example .env
+<span class="c"># Edit .env and set your Anthropic API key</span></pre>
+        <pre>ANTHROPIC_API_KEY=sk-ant-your-key-here
+CLIP_SERVER_URL=http://localhost:5001
+POSTGRES_URL=jdbc:postgresql://localhost:5432/wisteria
+POSTGRES_USER=wisteria
+POSTGRES_PASSWORD=wisteria
+REDIS_HOST=localhost
+UPLOAD_DIR=/tmp/wisteria-uploads</pre>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-body">
+        <div class="step-title">Add POC catalog images</div>
+        <div class="step-desc">Copy 20–50 product images to <code>/tmp/wisteria-catalog/</code>. Edit <code>wisteria-api/src/main/resources/catalog/products.json</code> with matching entries:</div>
+        <pre>[
+  {
+    <span class="s">"id"</span>: <span class="s">"a1b2c3d4-..."</span>,
+    <span class="s">"name"</span>: <span class="s">"Aiko Oak Side Table"</span>,
+    <span class="s">"category"</span>: <span class="s">"tables"</span>,
+    <span class="s">"imagePath"</span>: <span class="s">"aiko-side-table.jpg"</span>
+  }
+]</pre>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-body">
+        <div class="step-title">Start infrastructure (Docker Compose)</div>
+        <pre>docker compose up -d</pre>
+        <div class="step-desc" style="margin-top:8px">Starts PostgreSQL + pgvector on <code>:5432</code>, Redis on <code>:6379</code>, the Python CLIP server on <code>:5001</code>, and the VLM server on <code>:5002</code>. First start downloads the CLIP ViT-L/14 weights (~1.7 GB) and the fine-tuned VLM weights. Allow 5–10 minutes. Check status: <code>docker compose logs -f vlm-server</code></div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">4</div>
+      <div class="step-body">
+        <div class="step-title">Run database migrations (Flyway)</div>
+        <pre>cd wisteria-api
+./mvnw spring-boot:run -Dspring-boot.run.profiles=migrate</pre>
+        <div class="step-desc" style="margin-top:8px">Creates <code>product_embeddings</code> (with <code>vector(768)</code> column), <code>product_style_attributes</code>, and <code>style_query_log</code>. Creates the HNSW index. Runs once; subsequent runs are no-ops.</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">5</div>
+      <div class="step-body">
+        <div class="step-title">Index the catalog</div>
+        <pre>./mvnw spring-boot:run -Dspring-boot.run.profiles=index</pre>
+        <div class="step-desc" style="margin-top:8px">Runs <code>CatalogIndexService</code> via <code>CommandLineRunner</code>. With 50 products on CPU CLIP: ~5–8 min. On Apple Silicon MPS: ~2–3 min. Monitor progress:</div>
+        <pre>curl http://localhost:8080/api/v1/admin/index-status</pre>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">6</div>
+      <div class="step-body">
+        <div class="step-title">Start Spring Boot API</div>
+        <pre>./mvnw spring-boot:run</pre>
+        <div class="step-desc" style="margin-top:8px">Verify all dependencies are reachable:</div>
+        <pre>curl http://localhost:8080/api/v1/style/health</pre>
+        <div class="step-desc" style="margin-top:8px">Expected: <code>{"clip":"ok","vlm":"ok","postgres":"ok","redis":"ok"}</code></div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">7</div>
+      <div class="step-body">
+        <div class="step-title">Start React frontend</div>
+        <pre>cd wisteria-ui
+npm install
+npm run dev</pre>
+        <div class="step-desc" style="margin-top:8px">Open <code>http://localhost:3000</code>. Upload any room photo or magazine scan to test the full pipeline end-to-end.</div>
+      </div>
+    </div>
+  </div>
+
+  <h2>docker-compose.yml</h2>
+  <pre>services:
+  postgres:
+    image: ankane/pgvector:latest
+    environment:
+      POSTGRES_DB: wisteria
+      POSTGRES_USER: wisteria
+      POSTGRES_PASSWORD: wisteria
+    ports: [<span class="s">"5432:5432"</span>]
+    volumes: [<span class="s">"pgdata:/var/lib/postgresql/data"</span>]
+    healthcheck:
+      test: [<span class="s">"CMD-SHELL"</span>, <span class="s">"pg_isready -U wisteria"</span>]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    ports: [<span class="s">"6379:6379"</span>]
+
+  clip-server:
+    build: ./clip-server
+    ports: [<span class="s">"5001:5001"</span>]
+    volumes: [<span class="s">"clipcache:/root/.cache"</span>]
+    healthcheck:
+      test: [<span class="s">"CMD"</span>, <span class="s">"curl"</span>, <span class="s">"-f"</span>, <span class="s">"http://localhost:5001/health"</span>]
+      interval: 10s
+      start_period: 120s
+
+  vlm-server:
+    build: ./vlm-server
+    ports: [<span class="s">"5002:5002"</span>]
+    volumes: [<span class="s">"./vlm-server/adapter:/app/adapter"</span>, <span class="s">"vlmcache:/root/.cache"</span>]
+    <span class="c"># Comment out the deploy block to run CPU-only</span>
+    deploy:
+      resources:
+        reservations:
+          devices: [{driver: nvidia, count: 1, capabilities: [gpu]}]
+    healthcheck:
+      test: [<span class="s">"CMD"</span>, <span class="s">"curl"</span>, <span class="s">"-f"</span>, <span class="s">"http://localhost:5002/health"</span>]
+      interval: 10s
+      start_period: 180s
+
+volumes:
+  pgdata:
+  clipcache:
+  vlmcache:</pre>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     SECTION: NFR & FAILURES
+═══════════════════════════════════════════ -->
+<div id="s-nfr" class="section">
+  <div class="page-header">
+    <div class="eyebrow">Operations</div>
+    <h1>NFR &amp; failure modes</h1>
+    <div class="desc">Non-functional requirements and graceful degradation paths for the local POC. Most failure modes are simpler than production since there are no network hops.</div>
+  </div>
+
+  <h2>Performance targets (local POC)</h2>
+  <div class="card-grid g3">
+    <div class="metric"><div class="lbl">Cache hit latency</div><div class="val">&lt;80 ms</div><div class="sub">Redis pHash hit</div></div>
+    <div class="metric"><div class="lbl">Cold query (CPU CLIP)</div><div class="val">5–7 s</div><div class="sub">Acceptable for demo</div></div>
+    <div class="metric"><div class="lbl">Cold query (MPS)</div><div class="val">1–2 s</div><div class="sub">Apple Silicon</div></div>
+  </div>
+  <div class="card-grid g3" style="margin-bottom:24px">
+    <div class="metric"><div class="lbl">Indexing (CPU, 50 products)</div><div class="val">5–8 min</div><div class="sub">One-time setup</div></div>
+    <div class="metric"><div class="lbl">ANN search (50 products)</div><div class="val">&lt;5 ms</div><div class="sub">HNSW, tiny catalog</div></div>
+    <div class="metric"><div class="lbl">Template explanation</div><div class="val">&lt;1 ms</div><div class="sub">Deterministic, in-memory</div></div>
+  </div>
+
+  <h2>Failure modes and mitigations</h2>
+  <table class="map-table">
+    <thead>
+      <tr><th>Failure</th><th>Severity</th><th>Mitigation</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>CLIP server not started / still loading model</td>
+        <td><span class="badge b-coral">High</span></td>
+        <td>Spring Boot <code>@EventListener(ApplicationReadyEvent.class)</code> pings <code>:5001/health</code> and logs a clear warning. The <code>GET /health</code> endpoint also reports CLIP status so the React UI can show a "not ready" state.</td>
+      </tr>
+      <tr>
+        <td>CLIP embedding call times out (CPU overloaded)</td>
+        <td><span class="badge b-amber">Medium</span></td>
+        <td><code>WebClient</code> timeout set to 10 s. On timeout, return HTTP 503 with <code>{"error":"embedding_timeout","retry_after":5}</code>. React shows a retry button rather than a blank error screen.</td>
+      </tr>
+      <tr>
+        <td>VLM server down / extraction timeout</td>
+        <td><span class="badge b-amber">Medium</span></td>
+        <td>Fall back to embedding-only ANN search (skip attribute boosting). Return results with <code>why_matches</code> set to a CLIP-only template (<em>"Strong visual match"</em>). Self-hosted, so no key/quota failure class — only process/health failures, surfaced via <code>/health</code> and a circuit breaker on the VLM WebClient.</td>
+      </tr>
+      <tr>
+        <td>pgvector not available (Docker not started)</td>
+        <td><span class="badge b-coral">High</span></td>
+        <td>Spring Boot fails fast on startup with a clear error. Docker Compose healthcheck on postgres prevents the API from starting until the DB is ready when using <code>depends_on: condition: service_healthy</code>.</td>
+      </tr>
+      <tr>
+        <td>Redis not available</td>
+        <td><span class="badge b-green">Low</span></td>
+        <td>Cache is non-blocking. <code>CacheService</code> wraps all Redis calls in try-catch. On any Redis error, skip cache probe and write, run full pipeline, log a warning. Functional degradation only (slower, no caching).</td>
+      </tr>
+      <tr>
+        <td>Sparse match — few/no overlapping attributes</td>
+        <td><span class="badge b-green">Low</span></td>
+        <td>Template engine drops empty slots and falls back through a priority order (era → material → palette → "visually similar"). It can never produce malformed or off-tone text because output is a pure function of the matched fields. No retry path needed.</td>
+      </tr>
+      <tr>
+        <td>VLM taxonomy gap / model drift over time</td>
+        <td><span class="badge b-amber">Medium</span></td>
+        <td>New catalog styles outside the trained vocabulary degrade silently. Mitigation: log low-confidence extractions (from the <code>confidence</code> JSONB), sample them into the next labeling round, and schedule periodic re-training. Track per-attribute accuracy on the golden set as a release gate.</td>
+      </tr>
+      <tr>
+        <td>Model version mismatch (CLIP or VLM re-trained)</td>
+        <td><span class="badge b-coral">High</span></td>
+        <td>Store <code>model_ver</code> in both <code>product_embeddings</code> (CLIP) and <code>product_style_attributes</code> (VLM). On startup, <code>CatalogIndexService</code> checks all indexed rows use the current versions. A CLIP change forces re-embedding; a VLM change forces re-extraction. Mismatch logs a warning and blocks queries until re-indexed.</td>
+      </tr>
+      <tr>
+        <td>Poor match quality on abstract images (lifestyle shots)</td>
+        <td><span class="badge b-green">Low</span></td>
+        <td>Accept for POC. Production mitigation: add a zero-shot image type classifier to detect lifestyle vs product photo and adjust the Claude Vision prompt framing. Set <code>"inspiration_mode": true</code> in response so the UI can set expectations.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>Quality evaluation — proving "closest aesthetic matches"</h2>
+  <p>The POC isn't done when the plumbing works; it's done when match quality is demonstrated. Before the demo: build a <strong>golden set of 15 inspiration images</strong> mirroring the scenario verbatim — 5 clean product shots, 5 room scenes, 3 Instagram screenshots (with UI chrome), 2 magazine scans. For each, a human marks every returned product relevant or irrelevant. Sign-off target: <strong>precision@8 ≥ 60%</strong>. Grid-search the re-ranking weights α ∈ {0.5, 0.65, 0.8} against this set and record the chosen values in the README. Pull p50/p95 latency from <code>style_query_log</code> across 30 queries. Cost check: <strong>$0 per-query API cost</strong> — self-hosted Qwen2.5-VL + CLIP fanned out on the virtual-thread executor; the only model spend is one-time Phase 1 distillation labeling, and indexing is local compute. (Running the optional Claude vision/explanation providers instead would add ≈ $0.01–0.03 per cold query.)</p>
+
+  <h2>Production migration path</h2>
+  <div class="card-grid g2">
+    <div class="card">
+      <h3>When to migrate off local</h3>
+      <p>The POC is ready to move to production infrastructure when: (1) the core embedding + search + explanation quality is validated with real Wisteria catalog images, (2) the re-ranking weights (α, β) have been tuned via user feedback, and (3) the API contract is stable.</p>
+    </div>
+    <div class="card">
+      <h3>What changes in production</h3>
+      <p>Swap <code>ClipEmbeddingService</code> WebClient URL from <code>localhost:5001</code> to the SageMaker endpoint URL. Swap <code>Files.copy()</code> image save for an S3 presigned upload. Swap the Docker pgvector container for RDS. Swap local Redis for ElastiCache. Spring service layer code does not change.</p>
+    </div>
+  </div>
+
+  <div class="doc-footer">
+    <span>Wisteria Visual Style Matching — HLD v3.0 · Self-Hosted Vision</span>
+    <span>Spring Boot 3.x · React 18 · CLIP ViT-L/14 · Qwen2.5-VL-7B · pgvector · Redis</span>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     SECTION: COST ANALYSIS
+═══════════════════════════════════════════ -->
+<div id="s-cost" class="section">
+  <div class="page-header">
+    <div class="eyebrow">High Level Design</div>
+    <h1>Cost Analysis</h1>
+    <div class="desc">v3.0 eliminates the metered per-query Claude API cost. Spend is now one-time (model training / distillation) plus fixed infrastructure (GPU, CLIP, pgvector, Redis). Per-query cost is compute-only — no external API calls on the critical path. The cost profile flips dramatically once you move off toy scale.</div>
+    <div class="badge-row">
+      <span class="badge b-coral">Claude (offline only) — labeling teacher</span>
+      <span class="badge b-teal">Qwen2.5-VL-7B · self-hosted</span>
+      <span class="badge b-teal">CLIP ViT-L/14 · self-hosted</span>
+      <span class="badge b-green">Template engine · $0</span>
+      <span class="badge b-gray">GPU hosting · fixed monthly</span>
+    </div>
+  </div>
+
+  <div class="card-grid g3" style="margin-bottom:24px">
+    <div class="metric"><div class="lbl">One-time distillation (5k images)</div><div class="val">~$9–10</div><div class="sub">Batch API (50% off real-time). As-built: $1.80 / 462 imgs</div></div>
+    <div class="metric"><div class="lbl">Cold query (full pipeline)</div><div class="val">$0 API</div><div class="sub">GPU-only; no external calls</div></div>
+    <div class="metric"><div class="lbl">Cache hit (Redis pHash)</div><div class="val">$0</div><div class="sub">No GPU inference either</div></div>
+  </div>
+
+  <div class="info-bar" style="margin-bottom:20px;">
+    <div class="bar-icon">✓</div>
+    <div><strong>The shift:</strong> v2.1 was $0.006–0.01 per query + labeling. v3.0 is ~$0 per query after a one-time ~$15–30 labeling and training pass (labeling via Batch API at 50% discount: ~$9–10 for 5k images + ~$5–20 GPU training). At 1,000 queries/day, you break even in 2 weeks vs. perpetual Claude spend.</div>
+  </div>
+
+  <h2>Where the spend goes</h2>
+  <table class="map-table">
+  <tbody>
+  <tr><td>One-time: Distillation (Phase 1)</td><td class="arr">→</td><td>Claude Sonnet 4.6 labels 5k–10k catalog + query images via <strong>Batch API (50% off real-time)</strong>. ~$9–10 for 5k images. As-built: 462 images cost ~$1.80 total.</td></tr>
+  <tr><td>One-time: LoRA fine-tuning (Phase 2)</td><td class="arr">→</td><td>PEFT fine-tune Qwen2.5-VL-7B on labeled data; runs on your GPU or cloud compute. ~$5–20 if outsourced.</td></tr>
+  <tr><td>Ongoing: GPU hosting</td><td class="arr">→</td><td>Self-hosted VLM inference. Single 24GB GPU (e.g., RTX 4090, ~$2–8k purchase or $200–400/mo cloud). Alternative: Florence-2 on a 16GB or 8GB GPU.</td></tr>
+  <tr><td>Per-query: Runtime</td><td class="arr">→</td><td>CLIP embedding (~2–3W for 7B VLM on query-time extraction). No external API. Cache hits bypass both models.</td></tr>
+  </tbody>
+  </table>
+
+  <h2>Per-query hardware cost (v3.0)</h2>
+  <table class="schema-table">
+    <thead><tr><th>Component</th><th>Hardware</th><th>~Latency</th><th>~Power draw</th><th>Cost / 1K queries</th></tr></thead>
+    <tbody>
+      <tr><td class="fn-col">CLIP embedding</td><td class="ft-col">RTX 4090 / L40</td><td class="fd-col">2–3 s (GPU) / 3–6 s (CPU)</td><td class="fd-col">~200–250W</td><td class="fn-col">&lt;$0.01</td></tr>
+      <tr><td class="fn-col">VLM extraction</td><td class="ft-col">RTX 4090 / L40</td><td class="fd-col">0.2–0.4 s</td><td class="fd-col">~150–180W</td><td class="fn-col">&lt;$0.01</td></tr>
+      <tr><td class="fn-col">Template explain</td><td class="ft-col">CPU</td><td class="fd-col">&lt;1 ms</td><td class="fd-col">negligible</td><td class="fn-col">$0</td></tr>
+      <tr><td class="fn-col">Cold query (GPU)</td><td class="ft-col">—</td><td class="fd-col">~0.3–1 s total</td><td class="fd-col">—</td><td class="fn-col">&lt;$0.02</td></tr>
+      <tr><td class="fn-col">Cache hit</td><td class="ft-col">—</td><td class="fd-col">&lt;80 ms</td><td class="fd-col">~50W (Redis)</td><td class="fn-col">&lt;$0.001</td></tr>
+    </tbody>
+  </table>
+  
+  <div class="info-bar">
+    <div class="bar-icon">✓</div>
+    <div>Cost / 1K queries is derived from 24/7 GPU power draw at cloud rates (~$0.30–0.50/GPU-hr on GCP/AWS). Local ownership amortizes differently: ~$2–8k hardware ÷ useful lifetime ÷ annual query volume.</div>
+  </div>
+
+  <h2>Scaling — catalog indexing (one-time per version)</h2>
+  <table class="schema-table">
+    <thead><tr><th>Catalog size</th><th>VLM extract (GPU)</th><th>VLM extract (CPU)</th><th>Cost estimate</th></tr></thead>
+    <tbody>
+      <tr><td class="fn-col">500 products</td><td class="fd-col">~1–2 min</td><td class="fd-col">~8–12 min</td><td class="fn-col">~$0.02 (GPU-hr)</td></tr>
+      <tr><td class="fn-col">10,000 products</td><td class="fd-col">~3–5 min</td><td class="fd-col">~30–45 min</td><td class="fn-col">~$0.10</td></tr>
+      <tr><td class="fn-col">100,000 products</td><td class="fd-col">~20–30 min</td><td class="fd-col">~5–8 hrs</td><td class="fn-col">~$1.00</td></tr>
+    </tbody>
+  </table>
+
+  <div class="info-bar">
+    <div class="bar-icon">✓</div>
+    <div>Indexing is a batch job — run it offline when convenient. No API rate limits, no queued requests. Parallel VLM calls (if GPU supports) further speed up the process. A model-version change re-indexes only the VLM extraction, not CLIP (unless CLIP also updated).</div>
+  </div>
+
+  <h2>Scaling — query volume (ongoing, with cache)</h2>
+  <p>Assumes a single RTX 4090 (~$2–8k purchase or $250–400/mo cloud). Costs are GPU power draw amortized. Cache-hit rate is the dominant lever — every hit skips both GPU models.</p>
+  <table class="schema-table">
+    <thead><tr><th>Queries / day</th><th>Cache hit 30%</th><th>Cache hit 60%</th><th>Cache hit 80%</th></tr></thead>
+    <tbody>
+      <tr><td class="fn-col">1,000</td><td class="fd-col">~$5/mo</td><td class="fd-col">~$2/mo</td><td class="fd-col">&lt;$1/mo</td></tr>
+      <tr><td class="fn-col">10,000</td><td class="fd-col">~$40/mo</td><td class="fd-col">~$20/mo</td><td class="fd-col">~$8/mo</td></tr>
+      <tr><td class="fn-col">100,000</td><td class="fd-col">~$400/mo</td><td class="fd-col">~$200/mo</td><td class="fd-col">~$80/mo</td></tr>
+    </tbody>
+  </table>
+
+  <div class="info-bar">
+    <div class="bar-icon">✓</div>
+    <div>Compare to v2.1: 10k queries/day at 30% cache hit would be ~$1,300/mo in Claude API. v3.0 is ~$40/mo in GPU power. <strong>32× cheaper at scale.</strong> At 100k queries/day, the delta is ~$12.6k/mo (v2.1) vs. ~$400/mo (v3.0).</div>
+  </div>
+
+  <h2>Cost levers</h2>
+  <div class="card-grid g2">
+    <div class="card"><h3>Cache hit rate (biggest)</h3><p>Every Redis pHash hit saves one CLIP + VLM call. At 30% → 60%, you halve GPU power spend. Tune TTL (3600 s) and 256 MB cap. A "warm" cache from prior queries is free.</p></div>
+    <div class="card"><h3>Model size choice</h3><p>Florence-2 is 0.77B or 2.3B, runs on 8–16GB GPUs; Qwen2.5-VL-7B needs 24GB. Florence-2 is 3–5× cheaper on GPU but slightly lower accuracy. Measure on your golden set before deciding.</p></div>
+    <div class="card"><h3>GPU location</h3><p>Local RTX 4090: ~$2–8k purchase, then marginal cost is electricity (~$10–20/mo). Cloud GPU: $250–400/mo. Local wins if you operate &gt;6 months. Spot instances cut cloud cost by 70%.</p></div>
+    <div class="card"><h3>Training data quality</h3><p>Better labels = fewer retraining cycles. A 5k golden set from Claude labels well; bad labels force monthly retraining. Invest in labeling upfront.</p></div>
+  </div>
+
+  <h2>Cost profile by scale</h2>
+  <div class="card-grid g3" style="margin-bottom:20px">
+    <div class="metric"><div class="lbl">POC (200 queries/day)</div><div class="val">$20–50/mo</div><div class="sub">One shared GPU + distill cost</div></div>
+    <div class="metric"><div class="lbl">1,000-product catalog</div><div class="val">~$5–20</div><div class="sub">indexing + distillation</div></div>
+    <div class="metric"><div class="lbl">Hosting (CPU-only)</div><div class="val">~$20/mo</div><div class="sub">CLIP + VLM + pgvector on CPU</div></div>
+  </div>
+  <div class="info-bar" style="margin-bottom:20px;">
+    <div class="bar-icon">✓</div>
+    <div><strong>Break-even calculation:</strong> If you're at 1,000 queries/day, v2.1 costs ~$130/mo in Claude API alone. v3.0 one-time cost (distillation $20 + training $10 + indexing $1) is ~$30, plus ~$30/mo GPU (cloud) or ~$2/mo (local ownership). You break even in 3–4 months and save $100+/mo thereafter.</div>
+  </div>
+
+  <div class="warn-bar">
+    <div class="bar-icon">⚠</div>
+    <div><strong>Recommendation:</strong> For POCs (&lt;100 queries/day), start CPU-only; the latency is acceptable for demos. For pilots (100–1,000 queries/day), buy a single used RTX 4090 or rent cloud GPU on spot. For production (1,000+ queries/day), the GPU amortizes instantly. Do NOT use v2.1 (metered API) at scale — the cost is an order of magnitude higher.</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     SECTION: v3.0 BUILD NOTES
+═══════════════════════════════════════════ -->
+<div id="s-implnotes" class="section">
+  <div class="page-header">
+    <div class="eyebrow">Implementation</div>
+    <h1>v3.0 build notes</h1>
+    <div class="desc">Decisions taken while building v3.0 that refine this HLD. The hosted (v2.1) and self-hosted (v3.0) paths ship together and are chosen by config — v3.0 <em>adds</em> options rather than deleting the hosted ones.</div>
+    <div class="badge-row">
+      <span class="badge b-teal">coexistence</span>
+      <span class="badge b-coral">provider switches</span>
+      <span class="badge b-blue">S3 sourcing</span>
+    </div>
+  </div>
+
+  <h2>Vision &amp; explanation are pluggable</h2>
+  <div class="card-grid g2">
+    <div class="card">
+      <h3>Vision — <code>wisteria.vision.provider</code></h3>
+      <p><code>claude</code> (default) → Claude Vision · <code>vlm</code> → self-hosted Qwen2.5-VL on <code>:5002</code>. One <code>StyleExtractor</code> seam, two implementations (<code>service/vision/claude</code>, <code>service/vision/vlm</code>), exactly one active via <code>@ConditionalOnProperty</code>. Running fully self-hosted needs no external API key at runtime.</p>
+    </div>
+    <div class="card">
+      <h3>Explanation — <code>wisteria.explain.provider</code></h3>
+      <p><code>template</code> (default) → deterministic engine · <code>claude</code> → Haiku. One <code>Explainer</code> seam (<code>service/explain/template</code>, <code>service/explain/claude</code>). Claude Vision/Haiku are <strong>retained behind the switches</strong>, not deleted — enabling A/B comparison and an incremental cutover.</p>
+    </div>
+  </div>
+
+  <h2>Image sourcing &amp; formats</h2>
+  <div class="info-bar">
+    <div class="bar-icon">ℹ</div>
+    <div><strong>Production source of truth is S3.</strong> The <code>wisteria.com</code> Shopify scrape (<code>training/fetch_catalog.py</code>) is POC-only scaffolding to assemble a category-balanced catalog quickly. Image formats are <strong>JPEG/PNG only</strong> — WebP handling was removed from <code>ImageNormalizer</code>.</div>
+  </div>
+
+  <h2>Taxonomy widened to the real catalog</h2>
+  <p><strong>material</strong> += <code>teak, wood, iron, cane, bone</code>; <strong>era/style</strong> += <code>organic-modern, coastal, bohemian</code> (organic-modern is the brand's dominant style framing). A provenance <strong>origin</strong> attribute was prototyped and dropped — not reliably inferable from a product image. Vocabulary is kept in sync across <code>training/taxonomy.py</code>, <code>vlm-server/main.py</code>, the Java tool schema, and the DB.</p>
+
+  <h2>POC runs before fine-tuning</h2>
+  <p>The VLM server falls back to base <code>Qwen2.5-VL-7B-Instruct</code> when no LoRA adapter is present, so indexing and query work end-to-end before the Phase 1–2 training completes.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     SECTION: FLOW DIAGRAM & COST CALCULATOR
+═══════════════════════════════════════════ -->
+<div id="s-flowdiagram" class="section">
+  <div class="page-header">
+    <div class="eyebrow">Architecture</div>
+    <h1>End-to-end flow diagram</h1>
+    <div class="desc">The complete v3.0 request pipeline — from image upload through provider-switch extraction, ANN search, re-ranking, and template explanation. See Cost calculator for the economics of each path.</div>
+  </div>
+  <div class="fc-wrap" id="fc-flow-wrap">
+    <div class="tabs">
+      <div class="tab active" onclick="fcTab('flow','fc-flow-wrap')">&#128200; End-to-End Flow</div>
+    </div>
+    <div class="panel active" id="fc-flow-wrap-tab-flow">
+
+  <div class="flow-wrap">
+  <svg class="flow" viewBox="0 0 1060 720" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <marker id="arr"      markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#94a3b8"/></marker>
+      <marker id="arr-ai"   markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#7c3aed"/></marker>
+      <marker id="arr-vlm"  markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#059669"/></marker>
+      <marker id="arr-ok"   markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#2563eb"/></marker>
+      <marker id="arr-warn" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#d97706"/></marker>
+      <marker id="arr-tpl"  markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#ea580c"/></marker>
+    </defs>
+
+    <!-- Title bar -->
+    <rect x="10" y="10" width="1040" height="38" rx="8" fill="#ede9fe"/>
+    <text x="530" y="34" text-anchor="middle" font-size="13" font-weight="700" fill="#6d28d9">WISTERIA VISUAL STYLE MATCHING — END-TO-END FLOW (v3.0 · Provider-Switch Architecture)</text>
+
+    <!-- Actor column -->
+    <rect x="10" y="56" width="110" height="640" rx="6" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.5"/>
+    <text transform="translate(65,376) rotate(-90)" text-anchor="middle" font-size="11" font-weight="700" fill="#64748b" letter-spacing="0.08em">ACTOR / LAYER</text>
+
+    <!-- Lane: User -->
+    <rect x="120" y="56" width="165" height="640" fill="#f5f3ff"/>
+    <text x="202" y="74" text-anchor="middle" font-size="11" fill="#7c3aed" font-weight="700">(1) USER INPUT</text>
+    <text x="60" y="140" text-anchor="middle" font-size="10" fill="#7c3aed" font-weight="700">USER</text>
+
+    <!-- Lane: Spring Boot -->
+    <rect x="285" y="56" width="170" height="640" fill="#eff6ff"/>
+    <text x="370" y="74" text-anchor="middle" font-size="11" fill="#2563eb" font-weight="700">(2) SPRING BOOT</text>
+    <text x="60" y="270" text-anchor="middle" font-size="10" fill="#2563eb" font-weight="700">API LAYER</text>
+
+    <!-- Lane: ML Models -->
+    <rect x="455" y="56" width="220" height="640" fill="#faf5ff"/>
+    <text x="565" y="74" text-anchor="middle" font-size="11" fill="#7c3aed" font-weight="700">(3) ML MODELS</text>
+    <text x="60" y="390" text-anchor="middle" font-size="10" fill="#7c3aed" font-weight="700">MODEL LAYER</text>
+
+    <!-- Lane: pgvector -->
+    <rect x="675" y="56" width="185" height="640" fill="#f0fdf4"/>
+    <text x="767" y="74" text-anchor="middle" font-size="11" fill="#059669" font-weight="700">(4) SEARCH + RANK</text>
+    <text x="60" y="500" text-anchor="middle" font-size="10" fill="#059669" font-weight="700">SEARCH</text>
+
+    <!-- Lane: Response -->
+    <rect x="860" y="56" width="190" height="640" fill="#fff7ed"/>
+    <text x="955" y="74" text-anchor="middle" font-size="11" fill="#ea580c" font-weight="700">(5) RESPONSE</text>
+    <text x="60" y="600" text-anchor="middle" font-size="10" fill="#ea580c" font-weight="700">OUTPUT</text>
+
+    <!-- ── BOXES ─────────────────────────────────────────────────── -->
+
+    <!-- Upload image -->
+    <rect x="130" y="96" width="150" height="52" rx="8" fill="#7c3aed" stroke="#6d28d9" stroke-width="1.5"/>
+    <text x="205" y="118" text-anchor="middle" font-size="12" font-weight="700" fill="#fff">Upload Image</text>
+    <text x="205" y="133" text-anchor="middle" font-size="10" fill="#ddd6fe">Room / magazine / screenshot</text>
+    <text x="205" y="145" text-anchor="middle" font-size="9" fill="#c4b5fd">max 10 MB · JPEG/PNG only (WebP removed)</text>
+
+    <!-- Status polling -->
+    <rect x="130" y="390" width="150" height="44" rx="8" fill="#ede9fe" stroke="#7c3aed" stroke-width="1.5" stroke-dasharray="5,3"/>
+    <text x="205" y="408" text-anchor="middle" font-size="11" font-weight="600" fill="#7c3aed">Status Polling</text>
+    <text x="205" y="423" text-anchor="middle" font-size="10" fill="#6d28d9">POST /api/v1/style/query</text>
+
+    <!-- StyleQueryController -->
+    <rect x="295" y="96" width="150" height="52" rx="8" fill="#2563eb" stroke="#1d4ed8" stroke-width="1.5"/>
+    <text x="370" y="118" text-anchor="middle" font-size="11" font-weight="700" fill="#fff">StyleQueryController</text>
+    <text x="370" y="133" text-anchor="middle" font-size="10" fill="#bfdbfe">POST /api/v1/style/query</text>
+    <text x="370" y="145" text-anchor="middle" font-size="9" fill="#93c5fd">topK, filterEra, filterMaterial</text>
+
+    <!-- ImageNormalizer -->
+    <rect x="295" y="188" width="150" height="52" rx="8" fill="#dbeafe" stroke="#2563eb" stroke-width="1.5"/>
+    <text x="370" y="208" text-anchor="middle" font-size="11" font-weight="600" fill="#1e40af">ImageNormalizer</text>
+    <text x="370" y="222" text-anchor="middle" font-size="10" fill="#1d4ed8">magic bytes · EXIF · 336×336</text>
+    <text x="370" y="234" text-anchor="middle" font-size="9" fill="#3b82f6">centre-crop · Base64 ~50KB</text>
+
+    <!-- Redis Cache -->
+    <rect x="295" y="280" width="150" height="44" rx="8" fill="#fef3c7" stroke="#d97706" stroke-width="1.5"/>
+    <text x="370" y="298" text-anchor="middle" font-size="11" font-weight="600" fill="#92400e">Redis pHash Cache</text>
+    <text x="370" y="313" text-anchor="middle" font-size="10" fill="#78350f">probe style:query:{hash64}</text>
+
+    <!-- CompletableFuture fan-out -->
+    <rect x="295" y="364" width="150" height="54" rx="8" fill="#dbeafe" stroke="#2563eb" stroke-width="1.5"/>
+    <text x="370" y="382" text-anchor="middle" font-size="11" font-weight="600" fill="#1e40af">CompletableFuture</text>
+    <text x="370" y="397" text-anchor="middle" font-size="10" fill="#1d4ed8">allOf(emb, attr).orTimeout(20s)</text>
+    <text x="370" y="410" text-anchor="middle" font-size="9" fill="#3b82f6">StyleExtractor · Explainer seams</text>
+
+    <!-- CLIP server -->
+    <rect x="465" y="280" width="160" height="52" rx="8" fill="#7c3aed" stroke="#6d28d9" stroke-width="1.5"/>
+    <text x="545" y="301" text-anchor="middle" font-size="12" font-weight="700" fill="#fff">CLIP Server :5001</text>
+    <text x="545" y="315" text-anchor="middle" font-size="10" fill="#ddd6fe">ViT-L/14 · float[768]</text>
+    <text x="545" y="327" text-anchor="middle" font-size="9" fill="#c4b5fd">POST /embed · L2-normalise</text>
+
+    <!-- VLM server (v3 path) -->
+    <rect x="465" y="370" width="160" height="62" rx="8" fill="#059669" stroke="#047857" stroke-width="2"/>
+    <text x="545" y="393" text-anchor="middle" font-size="12" font-weight="700" fill="#fff">VLM Server :5002</text>
+    <text x="545" y="407" text-anchor="middle" font-size="10" fill="#d1fae5">Fine-tuned Qwen2.5-VL-7B</text>
+    <text x="545" y="420" text-anchor="middle" font-size="9" fill="#a7f3d0">POST /extract · JSON attrs</text>
+    <text x="545" y="432" text-anchor="middle" font-size="9" fill="#6ee7b7">wisteria.vision.provider=vlm (default)</text>
+
+    <!-- VLM down fallback -->
+    <rect x="465" y="460" width="160" height="40" rx="8" fill="#fee2e2" stroke="#dc2626" stroke-width="1.5"/>
+    <text x="545" y="477" text-anchor="middle" font-size="11" font-weight="600" fill="#dc2626">VLM Degraded</text>
+    <text x="545" y="491" text-anchor="middle" font-size="9" fill="#b91c1c">embedding-only fallback · 200 OK</text>
+
+    <!-- pgvector ANN -->
+    <rect x="685" y="188" width="165" height="62" rx="8" fill="#059669" stroke="#047857" stroke-width="1.5"/>
+    <text x="767" y="210" text-anchor="middle" font-size="12" font-weight="700" fill="#fff">pgvector HNSW</text>
+    <text x="767" y="225" text-anchor="middle" font-size="10" fill="#d1fae5">ANN cosine search · Top 50</text>
+    <text x="767" y="238" text-anchor="middle" font-size="9" fill="#a7f3d0">SET LOCAL hnsw.ef_search=50</text>
+    <text x="767" y="249" text-anchor="middle" font-size="9" fill="#6ee7b7">m=16, ef_construction=64</text>
+
+    <!-- ReRankingService -->
+    <rect x="685" y="290" width="165" height="60" rx="8" fill="#dcfce7" stroke="#059669" stroke-width="1.5"/>
+    <text x="767" y="313" text-anchor="middle" font-size="11" font-weight="600" fill="#065f46">ReRankingService</text>
+    <text x="767" y="327" text-anchor="middle" font-size="10" fill="#166534">0.65×cosine + 0.35×attrOverlap</text>
+    <text x="767" y="341" text-anchor="middle" font-size="9" fill="#15803d">Top 8 · score 0–100</text>
+
+    <!-- ExplanationService -->
+    <rect x="685" y="390" width="165" height="60" rx="8" fill="#dcfce7" stroke="#059669" stroke-width="1.5"/>
+    <text x="767" y="413" text-anchor="middle" font-size="11" font-weight="600" fill="#065f46">ExplanationService</text>
+    <text x="767" y="427" text-anchor="middle" font-size="10" fill="#166534">Template engine · &lt;1 ms</text>
+    <text x="767" y="441" text-anchor="middle" font-size="9" fill="#15803d">era → material → palette …</text>
+
+    <!-- Redis write + query log -->
+    <rect x="295" y="500" width="150" height="44" rx="8" fill="#fef3c7" stroke="#d97706" stroke-width="1.5"/>
+    <text x="370" y="518" text-anchor="middle" font-size="11" font-weight="600" fill="#92400e">Cache Write + Log</text>
+    <text x="370" y="533" text-anchor="middle" font-size="10" fill="#78350f">Redis TTL 3600s · query_log</text>
+
+    <!-- Final response -->
+    <rect x="870" y="188" width="165" height="82" rx="8" fill="#ea580c" stroke="#c2410c" stroke-width="1.5"/>
+    <text x="952" y="211" text-anchor="middle" font-size="12" font-weight="700" fill="#fff">StyleQueryResponse</text>
+    <text x="952" y="226" text-anchor="middle" font-size="9" fill="#fed7aa">query_id · cache_hit · latency_ms</text>
+    <text x="952" y="239" text-anchor="middle" font-size="9" fill="#fed7aa">query_attributes · low_confidence</text>
+    <text x="952" y="252" text-anchor="middle" font-size="9" fill="#fed7aa">results[8]: score · matched_attrs</text>
+    <text x="952" y="265" text-anchor="middle" font-size="9" fill="#fed7aa">why_matches (template text)</text>
+
+    <!-- Cache HIT fast path -->
+    <rect x="870" y="290" width="165" height="44" rx="8" fill="#ffedd5" stroke="#ea580c" stroke-width="1.5"/>
+    <text x="952" y="309" text-anchor="middle" font-size="11" font-weight="600" fill="#c2410c">Cache HIT</text>
+    <text x="952" y="324" text-anchor="middle" font-size="10" fill="#9a3412">&lt;80ms · skip all models</text>
+
+    <!-- ── ARROWS ─────────────────────────────────────────────────────── -->
+
+    <!-- Upload → Controller -->
+    <line x1="280" y1="122" x2="293" y2="122" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arr)"/>
+    <!-- Controller → Normalizer -->
+    <line x1="370" y1="148" x2="370" y2="185" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arr)"/>
+    <!-- Normalizer → Redis probe -->
+    <line x1="370" y1="240" x2="370" y2="277" stroke="#d97706" stroke-width="1.5" marker-end="url(#arr-warn)"/>
+    <!-- Redis probe → Cache HIT (fast path) -->
+    <path d="M445 302 Q620 302 620 200 Q620 185 688 312" stroke="#ea580c" stroke-width="1.5" stroke-dasharray="5,3" fill="none" marker-end="url(#arr-tpl)"/>
+    <!-- Redis HIT box → cache response -->
+    <line x1="870" y1="312" x2="880" y2="312" stroke="#ea580c" stroke-width="1" stroke-dasharray="3,2"/>
+    <!-- Redis probe → fan-out (miss) -->
+    <line x1="370" y1="324" x2="370" y2="361" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arr)"/>
+    <!-- Fan-out → CLIP -->
+    <path d="M370 386 Q370 306 463 306" stroke="#7c3aed" stroke-width="2" fill="none" marker-end="url(#arr-ai)"/>
+    <!-- Fan-out → VLM -->
+    <path d="M370 408 Q370 401 463 401" stroke="#059669" stroke-width="2" fill="none" marker-end="url(#arr-vlm)"/>
+    <!-- VLM fail path -->
+    <line x1="545" y1="432" x2="545" y2="457" stroke="#dc2626" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#arr)"/>
+    <!-- CLIP → pgvector -->
+    <path d="M625 306 Q650 306 650 220 Q650 220 683 220" stroke="#7c3aed" stroke-width="2" fill="none" marker-end="url(#arr-ai)"/>
+    <!-- VLM attrs → reranking -->
+    <path d="M625 401 Q660 401 660 320 Q660 320 683 320" stroke="#059669" stroke-width="2" fill="none" marker-end="url(#arr-vlm)"/>
+    <!-- pgvector → reranking -->
+    <line x1="767" y1="250" x2="767" y2="287" stroke="#059669" stroke-width="2" marker-end="url(#arr-vlm)"/>
+    <!-- reranking → explanation -->
+    <line x1="767" y1="350" x2="767" y2="387" stroke="#059669" stroke-width="2" marker-end="url(#arr-vlm)"/>
+    <!-- explanation → response -->
+    <path d="M850 420 Q862 420 862 229 L868 229" stroke="#ea580c" stroke-width="2" fill="none" marker-end="url(#arr-tpl)"/>
+    <!-- response → fan-out (write cache) -->
+    <path d="M870 229 Q840 229 840 522 Q840 522 447 522" stroke="#d97706" stroke-width="1.5" stroke-dasharray="5,3" fill="none" marker-end="url(#arr-warn)"/>
+    <!-- Polling dashed from upload side -->
+    <line x1="205" y1="148" x2="205" y2="387" stroke="#7c3aed" stroke-width="1" stroke-dasharray="4,3" marker-end="url(#arr-ai)"/>
+
+    <!-- ── LEGEND ─────────────────────────────────────────────────────── -->
+    <rect x="120" y="590" width="920" height="100" rx="8" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.5"/>
+    <text x="136" y="610" font-size="10" font-weight="700" fill="#64748b" letter-spacing="0.06em">LEGEND</text>
+    <line x1="136" y1="624" x2="180" y2="624" stroke="#94a3b8" stroke-width="2" marker-end="url(#arr)"/>
+    <text x="184" y="628" font-size="10" fill="#64748b">Sync flow</text>
+    <line x1="265" y1="624" x2="309" y2="624" stroke="#7c3aed" stroke-width="2" marker-end="url(#arr-ai)"/>
+    <text x="313" y="628" font-size="10" fill="#64748b">CLIP / StyleExtractor seam</text>
+    <line x1="405" y1="624" x2="449" y2="624" stroke="#059669" stroke-width="2" marker-end="url(#arr-vlm)"/>
+    <text x="453" y="628" font-size="10" fill="#64748b">VLM / Search / Score</text>
+    <line x1="590" y1="624" x2="634" y2="624" stroke="#d97706" stroke-width="2" stroke-dasharray="5,3" marker-end="url(#arr-warn)"/>
+    <text x="638" y="628" font-size="10" fill="#64748b">Async / Cache write</text>
+    <line x1="780" y1="624" x2="824" y2="624" stroke="#dc2626" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#arr)"/>
+    <text x="828" y="628" font-size="10" fill="#64748b">Failure / Degraded path</text>
+
+    <text x="136" y="650" font-size="10" fill="#64748b">&#9656; PostgreSQL — product_embeddings (CLIP float[768]), product_style_attributes (6 fields + confidence JSONB + model_ver), style_query_log (vlm_degraded column)</text>
+    <text x="136" y="664" font-size="10" fill="#64748b">&#9656; Provider switches — wisteria.vision.provider=vlm|claude (default: vlm); wisteria.explain.provider=template|claude (default: template). Both implementations coexist in codebase.</text>
+    <text x="136" y="678" font-size="10" fill="#64748b">&#9656; Taxonomy expanded — material += teak, wood, iron, cane, bone; era += organic-modern, coastal, bohemian. VLM falls back to base Qwen2.5-VL-7B-Instruct when adapter/ is empty (no fine-tune required for POC).</text>
+  </svg>
+  </div>
+
+    </div>
+  </div>
+  <div class="doc-footer">
+    <span>Flow Diagram — v3.0 Provider-Switch Architecture</span>
+    <span>CLIP :5001 · Qwen2.5-VL :5002 · pgvector · Redis · Spring Boot</span>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     SECTION: COST CALCULATOR
+═══════════════════════════════════════════ -->
+<div id="s-costcalc" class="section">
+  <div class="page-header">
+    <div class="eyebrow">Economics</div>
+    <h1>Cost calculator</h1>
+    <div class="desc">Interactive per-query and per-month cost model for both runtime paths — Claude Vision API (v2.1) and Self-Hosted Qwen2.5-VL (v3.0). Adjust sliders to match your query volume and cache hit rate. See the Cost analysis section for the static breakdown narrative.</div>
+  </div>
+  <div class="fc-wrap" id="fc-cost-wrap">
+    <div class="tabs">
+      <div class="tab active" onclick="fcTab('claude','fc-cost-wrap')">&#129302; Claude API Mode</div>
+      <div class="tab green" onclick="fcTab('trained','fc-cost-wrap')">&#127968; Self-Hosted Model Mode</div>
+    </div>
+    <div class="panel active" id="fc-cost-wrap-tab-claude">
+
+  <div class="mode-banner claude">&#129302; Mode: Claude Sonnet 4.6 as Teacher Model (v2.1 labeling path) · Per-image API calls during training · No GPU required · Pay-as-you-go</div>
+  <p class="cost-header">
+    Claude Sonnet 4.6 (<code>claude-sonnet-4-6</code>) is the Teacher Model for Phase 1 labeling. Pricing: $3/M input · $15/M output.<br>
+    Per image labeled: ~570 input tokens (image + prompt) · ~100 output tokens (JSON extraction) = ~$0.0031/image.<br>
+    <strong>API constraints:</strong> Standard mode only — no Extended Thinking. Do NOT pass <code>temperature</code>, <code>top_p</code>, or <code>top_k</code> — HTTP 400 on Claude 4.x (breaking change from 4.1+).<br>
+    This tab models the <em>one-time distillation cost</em> (Phase 1 labeling) + the ongoing per-query cost if running v2.1 path in production.
+  </p>
+
+  <div class="slider-row">
+    <label>Queries / day</label>
+    <input type="range" id="c-slider" class="purple" min="10" max="10000" step="10" value="200" oninput="updateClaude()">
+    <span class="slider-val purple" id="c-display">200 queries/day</span>
+  </div>
+  <div class="slider-row">
+    <label>Cache hit rate</label>
+    <input type="range" id="c-cache" class="purple" min="0" max="90" step="5" value="30" oninput="updateClaude()">
+    <span class="slider-val purple" id="c-cache-display">30% cache hits</span>
+  </div>
+
+  <div class="cost-grid">
+    <div class="cost-card highlight-purple">
+      <div class="label">Claude API / month</div>
+      <div class="value" id="c-api-cost">$36</div>
+      <div class="sub" id="c-api-sub">~$0.006 per cold query</div>
+    </div>
+    <div class="cost-card">
+      <div class="label">Infrastructure / month</div>
+      <div class="value" id="c-infra-cost">$82</div>
+      <div class="sub">pgvector + Redis + CLIP compute</div>
+    </div>
+    <div class="cost-card">
+      <div class="label">Total / month</div>
+      <div class="value" id="c-total-cost">$118</div>
+      <div class="sub" id="c-per-q">~$0.020 per query incl. infra</div>
+    </div>
+  </div>
+
+  <div class="breakdown">
+    <div class="breakdown-head">
+      <span>Component</span><span>Unit cost</span><span>/month</span><span>Notes</span>
+    </div>
+    <div class="breakdown-row">
+      <span class="name-cell"><span class="dot" style="background:#7c3aed"></span>Claude Sonnet 4.6 — Teacher Model</span>
+      <span id="c-br-sonnet-u">$0.0031/img</span>
+      <span id="c-br-sonnet-m">—</span>
+      <span>570 in + 100 out tok · standard mode · no temp/top_p/top_k</span>
+    </div>
+    <div class="breakdown-row">
+      <span class="name-cell"><span class="dot" style="background:#6d28d9"></span>Claude Haiku (v2.1 explanation path)</span>
+      <span id="c-br-haiku-u">$0.0028/q</span>
+      <span id="c-br-haiku-m">—</span>
+      <span>750 in / 400 out · 1 batched call · replaced by template engine in v3.0</span>
+    </div>
+    <div class="breakdown-row">
+      <span class="name-cell"><span class="dot" style="background:#2563eb"></span>PostgreSQL + pgvector</span>
+      <span>fixed</span>
+      <span>$25</span>
+      <span>RDS t3.small · Local: free (Docker)</span>
+    </div>
+    <div class="breakdown-row">
+      <span class="name-cell"><span class="dot" style="background:#059669"></span>CLIP server (ECS t3.small)</span>
+      <span>fixed</span>
+      <span>$30</span>
+      <span>CPU inference ~3–6s · Local: free</span>
+    </div>
+    <div class="breakdown-row">
+      <span class="name-cell"><span class="dot" style="background:#f59e0b"></span>Redis (ElastiCache micro)</span>
+      <span>fixed</span>
+      <span>$18</span>
+      <span>256 MB · Local: free (Docker)</span>
+    </div>
+    <div class="breakdown-row">
+      <span class="name-cell"><span class="dot" style="background:#6b7280"></span>S3 + CDN + Misc</span>
+      <span>~$0.000/q</span>
+      <span>$9</span>
+      <span>Image storage · CloudFront · Logs</span>
+    </div>
+  </div>
+
+  <div class="scale-table">
+    <table>
+      <thead>
+        <tr><th>Scale</th><th>Queries/day</th><th>Claude/mo</th><th>Infra/mo</th><th>Total/mo</th><th>Per query</th><th>Viability</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>POC / Local</td><td>10–50</td><td>$1–9</td><td>$0 (Docker)</td><td>$1–9</td><td>$0.006</td><td><span class="badge green">&#10003; Free infra</span></td></tr>
+        <tr><td>Small team</td><td>100–500</td><td>$13–63</td><td>$82</td><td>$95–145</td><td>$0.006–0.015</td><td><span class="badge green">&#10003; Low cost</span></td></tr>
+        <tr><td>Growth</td><td>1,000–3,000</td><td>$126–378</td><td>$130</td><td>$256–508</td><td>$0.005–0.008</td><td><span class="badge yellow">&#9888; Monitor spend</span></td></tr>
+        <tr><td>Scale</td><td>10,000/day</td><td>$1,260/mo</td><td>$200</td><td>$1,460/mo</td><td>$0.005</td><td><span class="badge red">&#10006; Switch to v3.0</span></td></tr>
+      </tbody>
+    </table>
+    <p class="note">* 30% Redis cache hit rate assumed. At 60% hit rate, Claude API cost halves. At 10k+ queries/day, v3.0 self-hosted model (GPU) becomes significantly cheaper.
+    <br><strong>Local POC:</strong> Infrastructure cost = $0. Only cost is Claude API ≈ $0.006/cold query.</p>
+  </div>
+
+    </div>
+    <div class="panel" id="fc-cost-wrap-tab-trained">
+
+  <div class="mode-banner trained">&#127968; Mode: Self-Hosted Fine-Tuned VLM (v3.0) · Qwen2.5-VL-7B + LoRA · GPU required · Fixed cost at scale</div>
+
+  <div class="training-note">
+    &#128196; <strong>One-time training cost (Phase 1+2):</strong> <strong>Claude Sonnet 4.6</strong> (<code>claude-sonnet-4-6</code>) labels 5k–10k catalog images via the <strong>Anthropic Batch API (50% discount vs real-time)</strong> — ~$9–10 for 5k images (~$18–20 at real-time pricing). Standard mode only — no Extended Thinking, no <code>temperature</code>/<code>top_p</code>/<code>top_k</code> (HTTP 400 on 4.x). LoRA fine-tune on GPU (~2–4 hrs, ~$5–20 cloud GPU) = <strong>~$15–30 total.</strong> As-built: 462 images cost ~$1.80. After training, per-query API cost is <strong>$0</strong>. <em>The VLM server falls back to base Qwen2.5-VL-7B-Instruct when adapter/ is empty — POC runs with no fine-tune.</em>
+  </div>
+
+  <div class="slider-row">
+    <label>Queries / day</label>
+    <input type="range" id="t-slider" class="green" min="10" max="10000" step="10" value="200" oninput="updateTrained()">
+    <span class="slider-val green" id="t-display">200 queries/day</span>
+  </div>
+  <div class="slider-row">
+    <label>Cache hit rate</label>
+    <input type="range" id="t-cache" class="green" min="0" max="90" step="5" value="30" oninput="updateTrained()">
+    <span class="slider-val green" id="t-cache-display">30% cache hits</span>
+  </div>
+  <div class="slider-row">
+    <label>GPU type</label>
+    <select id="t-gpu" onchange="updateTrained()" style="padding:4px 10px; border-radius:6px; border:1.5px solid #d1d5db; font-size:13px; color:#374151;">
+      <option value="cloud_l40">Cloud L40 GPU (~$1.10/hr)</option>
+      <option value="cloud_4090">Cloud RTX 4090 (~$0.70/hr)</option>
+      <option value="local_4090" selected>Local RTX 4090 (~$0.012/hr elec.)</option>
+      <option value="cpu_only">CPU only (~$0.05/hr, slow)</option>
+    </select>
+  </div>
+
+  <div class="cost-grid">
+    <div class="cost-card highlight-green">
+      <div class="label">GPU / month</div>
+      <div class="value" id="t-gpu-cost">$9</div>
+      <div class="sub" id="t-gpu-sub">Local RTX 4090 electricity</div>
+    </div>
+    <div class="cost-card">
+      <div class="label">Infrastructure / month</div>
+      <div class="value" id="t-infra-cost">$82</div>
+      <div class="sub">pgvector + Redis + CLIP compute</div>
+    </div>
+    <div class="cost-card highlight-amber">
+      <div class="label">Total / month</div>
+      <div class="value" id="t-total-cost">$91</div>
+      <div class="sub" id="t-per-q">~$0.015 per query incl. infra</div>
+    </div>
+  </div>
+
+  <!-- Savings comparison bar -->
+  <div class="compare-bar" id="t-compare">
+    <span>&#128200; vs Claude API mode at same volume:</span>
+    <strong id="t-claude-equiv" style="color:#7c3aed">Claude would cost $118/mo</strong>
+    <span class="vs-sep">→</span>
+    <strong id="t-saving" style="color:#059669">Save $27/mo · break-even in 2 months</strong>
+  </div>
+
+  <div class="breakdown">
+    <div class="breakdown-head">
+      <span>Component</span><span>Unit cost</span><span>/month</span><span>Notes</span>
+    </div>
+    <div class="breakdown-row">
+      <span class="name-cell"><span class="dot" style="background:#059669"></span>VLM inference (Qwen2.5-VL)</span>
+      <span>$0/query</span>
+      <span id="t-br-vlm-m">$9</span>
+      <span id="t-br-vlm-note">GPU power only; no API cost</span>
+    </div>
+    <div class="breakdown-row">
+      <span class="name-cell"><span class="dot" style="background:#4ade80"></span>Template explanation engine</span>
+      <span>$0/query</span>
+      <span>$0</span>
+      <span>Pure Java, in-memory, &lt;1ms. No API.</span>
+    </div>
+    <div class="breakdown-row">
+      <span class="name-cell"><span class="dot" style="background:#2563eb"></span>PostgreSQL + pgvector</span>
+      <span>fixed</span>
+      <span>$25</span>
+      <span>RDS t3.small · Local: free (Docker)</span>
+    </div>
+    <div class="breakdown-row">
+      <span class="name-cell"><span class="dot" style="background:#7c3aed"></span>CLIP server (ECS t3.small)</span>
+      <span>fixed</span>
+      <span>$30</span>
+      <span>Unchanged from v2.1</span>
+    </div>
+    <div class="breakdown-row">
+      <span class="name-cell"><span class="dot" style="background:#f59e0b"></span>Redis (ElastiCache micro)</span>
+      <span>fixed</span>
+      <span>$18</span>
+      <span>256 MB · Local: free (Docker)</span>
+    </div>
+    <div class="breakdown-row">
+      <span class="name-cell"><span class="dot" style="background:#6b7280"></span>S3 + CDN + Misc</span>
+      <span>$0</span>
+      <span>$9</span>
+      <span>Image storage · CloudFront · Logs</span>
+    </div>
+    <div class="breakdown-row" style="background:#f0fdf4; border-top:2px solid #059669">
+      <span class="name-cell"><span class="dot" style="background:#dc2626"></span>Claude API (per-query)</span>
+      <span style="color:#059669; font-weight:700">$0</span>
+      <span style="color:#059669; font-weight:700">$0</span>
+      <span style="color:#059669">Removed from critical path &#10003;</span>
+    </div>
+  </div>
+
+  <div class="scale-table">
+    <table>
+      <thead>
+        <tr><th>Scale</th><th>Queries/day</th><th>GPU/mo</th><th>Infra/mo</th><th>Total/mo</th><th>vs Claude API</th><th>Viability</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>POC / Local</td><td>10–200</td><td>~$1–5 elec.</td><td>$0 (Docker)</td><td>~$1–5</td><td>⬇ ~95% cheaper</td><td><span class="badge green">&#10003; Best choice</span></td></tr>
+        <tr><td>Small team</td><td>200–1,000</td><td>$9–30</td><td>$82</td><td>$91–112</td><td>⬇ ~30–50% cheaper</td><td><span class="badge green">&#10003; Recommended</span></td></tr>
+        <tr><td>Growth</td><td>1,000–5,000</td><td>$30–100</td><td>$130</td><td>$160–230</td><td>⬇ ~55–65% cheaper</td><td><span class="badge green">&#10003; Clear winner</span></td></tr>
+        <tr><td>Enterprise</td><td>10,000+/day</td><td>$100–400</td><td>$250</td><td>$350–650</td><td>⬇ ~78% cheaper</td><td><span class="badge green">&#10003; 10–20× savings</span></td></tr>
+      </tbody>
+    </table>
+    <p class="note">
+      * Local RTX 4090: ~$0.012/hr electricity · ~$7–9/mo at typical POC load. Cloud GPU needed if no local hardware.
+      Break-even vs Claude API: typically <strong>2–4 months</strong> at 200+ queries/day.<br>
+      <strong>GPU option comparison:</strong> Cloud L40 = highest performance, flexible; Cloud 4090 spot = ~40% cheaper; Local 4090 = cheapest long-term; CPU = viable for offline indexing only (8–15s/query).<br>
+      <strong>Taxonomy (expanded):</strong> material += teak, wood, iron, cane, bone · era += organic-modern, coastal, bohemian · origin field prototyped and rejected (not reliably visual).<br>
+      <strong>Provider switch:</strong> <code>wisteria.vision.provider=claude</code> reverts to Sonnet 4.6 at runtime; <code>wisteria.explain.provider=claude</code> reverts to Haiku explanations. Both implementations compile and coexist.
+    </p>
+  </div>
+
+    </div>
+  </div>
+  <div class="doc-footer">
+    <span>Cost Calculator — Claude API vs Self-Hosted GPU</span>
+    <span>Sonnet 4.6 $3/M in · Haiku 4.5 $1/M in · RTX 4090 ~$0.012/hr</span>
+  </div>
+</div>
+
+<script>
+function fcTab(name, wrapId) {
+  var wrap = document.getElementById(wrapId);
+  if (!wrap) return;
+  wrap.querySelectorAll('.tab').forEach(function(t){ t.classList.remove('active'); });
+  wrap.querySelectorAll('.panel').forEach(function(p){ p.classList.remove('active'); });
+  var activePanel = document.getElementById(wrapId + '-tab-' + name);
+  if (activePanel) activePanel.classList.add('active');
+  event.currentTarget.classList.add('active');
+}
+
+function fcSwitchTabOrig(name) {
+  const tabs   = ['flow','claude','trained'];
+  const panels = ['tab-flow','tab-claude','tab-trained'];
+  document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', tabs[i] === name));
+  document.querySelectorAll('.panel').forEach((p,i) => p.classList.toggle('active', panels[i] === 'tab-'+name));
+}
+
+function fmt(n) {
+  if (n >= 1000) return '$' + (n/1000).toFixed(1) + 'k';
+  if (n >= 10)   return '$' + Math.round(n);
+  return '$' + n.toFixed(2);
+}
+function fmtQ(n) { return '$' + n.toFixed(4); }
+
+// ── Claude API mode ───────────────────────────────────────────────────────
+// Sonnet 4.6: $3/M input, $15/M output
+// Vision call per query: ~470 in tokens (image) + ~100 prompt in, ~100 out
+// Haiku 4.5: $1/M in, $5/M out
+// Explanation (batched 8): ~750 in, ~400 out
+const SONNET_IN  = 3   / 1_000_000;
+const SONNET_OUT = 15  / 1_000_000;
+const HAIKU_IN   = 1   / 1_000_000;
+const HAIKU_OUT  = 5   / 1_000_000;
+const VISION_IN  = 470;   // image tokens at 336x336
+const VISION_PROMPT_IN = 100;
+const VISION_OUT = 100;
+const HAIKU_IN_T = 750;
+const HAIKU_OUT_T = 400;
+
+const COST_VISION   = (VISION_IN + VISION_PROMPT_IN) * SONNET_IN + VISION_OUT * SONNET_OUT;
+const COST_HAIKU    = HAIKU_IN_T * HAIKU_IN + HAIKU_OUT_T * HAIKU_OUT;
+const CLAUDE_PER_Q  = COST_VISION + COST_HAIKU;
+const FIXED_INFRA_C = 82;  // pgvector 25 + CLIP 30 + Redis 18 + S3/CDN 9
+
+function updateClaude() {
+  const qpd    = parseInt(document.getElementById('c-slider').value);
+  const cache  = parseInt(document.getElementById('c-cache').value) / 100;
+  const cold   = qpd * (1 - cache);
+  const monthly = cold * 30;
+
+  const claudeMo = monthly * CLAUDE_PER_Q;
+  const infraMo  = FIXED_INFRA_C;
+  const totalMo  = claudeMo + infraMo;
+  const perQ     = totalMo / (qpd * 30);
+
+  document.getElementById('c-display').textContent        = qpd.toLocaleString() + ' queries/day';
+  document.getElementById('c-cache-display').textContent  = (cache*100).toFixed(0) + '% cache hits';
+  document.getElementById('c-api-cost').textContent       = fmt(claudeMo);
+  document.getElementById('c-infra-cost').textContent     = fmt(infraMo);
+  document.getElementById('c-total-cost').textContent     = fmt(totalMo);
+  document.getElementById('c-api-sub').textContent        = '~' + fmtQ(CLAUDE_PER_Q) + ' per cold query';
+  document.getElementById('c-per-q').textContent          = '~' + fmtQ(perQ) + ' per query incl. infra';
+  document.getElementById('c-br-sonnet-u').textContent    = fmtQ(COST_VISION) + '/query';
+  document.getElementById('c-br-haiku-u').textContent     = fmtQ(COST_HAIKU)  + '/query';
+  document.getElementById('c-br-sonnet-m').textContent    = fmt(monthly * COST_VISION);
+  document.getElementById('c-br-haiku-m').textContent     = fmt(monthly * COST_HAIKU);
+
+  // Keep trained tab's compare bar in sync
+  window._claudeMonthly = totalMo;
+  window._claudeQPD     = qpd;
+  window._claudeCache   = cache;
+}
+
+// ── Self-hosted model mode ────────────────────────────────────────────────
+// GPU options: hourly rate, watts
+const GPU_OPTS = {
+  cloud_l40:   { hr: 1.10, label: 'Cloud L40 · $1.10/hr' },
+  cloud_4090:  { hr: 0.70, label: 'Cloud RTX 4090 spot · $0.70/hr' },
+  local_4090:  { hr: 0.012, label: 'Local RTX 4090 · $0.012/hr elec.' },
+  cpu_only:    { hr: 0.05, label: 'CPU only · $0.05/hr' },
+};
+// A single GPU can serve queries 24/7. At <200 queries/day, GPU is mostly idle.
+// We calculate total GPU-hours used per month based on avg inference time per query.
+// VLM cold extract: ~0.4s (GPU). CLIP: ~0.4s. Total active: ~0.8s per cold query.
+const VLM_SECS_GPU = 0.8;   // avg GPU-active seconds per cold query
+const FIXED_INFRA_T = 82;   // same pgvector + Redis + CLIP + S3/CDN
+
+function updateTrained() {
+  const qpd   = parseInt(document.getElementById('t-slider').value);
+  const cache = parseInt(document.getElementById('t-cache').value) / 100;
+  const gpuKey= document.getElementById('t-gpu').value;
+  const gpu   = GPU_OPTS[gpuKey];
+
+  const coldPerDay  = qpd * (1 - cache);
+  const gpuSecsDay  = coldPerDay * VLM_SECS_GPU;
+  const gpuHrsDay   = gpuSecsDay / 3600;
+  // For cloud: pay per hour used. For local: always-on (24/7).
+  let gpuHrsMo;
+  if (gpuKey === 'local_4090') {
+    gpuHrsMo = 24 * 30;  // always on; electricity
+  } else if (gpuKey === 'cpu_only') {
+    gpuHrsMo = gpuHrsDay * 30 + 720; // base CPU runtime
+  } else {
+    // Cloud: round up to at least 2hr/day minimum useful instance
+    gpuHrsMo = Math.max(gpuHrsDay, 2) * 30;
+  }
+  const gpuMo   = gpuHrsMo * gpu.hr;
+  const infraMo = FIXED_INFRA_T;
+  const totalMo = gpuMo + infraMo;
+  const perQ    = totalMo / (qpd * 30);
+
+  document.getElementById('t-display').textContent       = qpd.toLocaleString() + ' queries/day';
+  document.getElementById('t-cache-display').textContent = (cache*100).toFixed(0) + '% cache hits';
+  document.getElementById('t-gpu-cost').textContent      = fmt(gpuMo);
+  document.getElementById('t-gpu-sub').textContent       = gpu.label;
+  document.getElementById('t-infra-cost').textContent    = fmt(infraMo);
+  document.getElementById('t-total-cost').textContent    = fmt(totalMo);
+  document.getElementById('t-per-q').textContent         = '~' + fmtQ(perQ) + ' per query incl. infra';
+  document.getElementById('t-br-vlm-m').textContent      = fmt(gpuMo);
+  document.getElementById('t-br-vlm-note').textContent   = gpu.label + ' · no API cost';
+
+  // Comparison bar
+  const claudeQPD   = window._claudeQPD   || qpd;
+  const claudeCache = window._claudeCache || 0.30;
+  const claudeColdMo = claudeQPD * (1 - claudeCache) * 30 * CLAUDE_PER_Q;
+  const claudeTotalMo = claudeColdMo + FIXED_INFRA_C;
+  const saving  = claudeTotalMo - totalMo;
+  const beMonths = (saving > 0 && totalMo > 0) ? Math.ceil(50 / (saving)) : 0;
+
+  document.getElementById('t-claude-equiv').textContent =
+    'Claude API equivalent: ' + fmt(claudeTotalMo) + '/mo';
+  if (saving > 0) {
+    document.getElementById('t-saving').textContent =
+      'Save ' + fmt(saving) + '/mo · break-even in ~' +
+      (beMonths > 0 ? beMonths + ' months' : '<1 month');
+    document.getElementById('t-saving').style.color = '#059669';
+  } else {
+    document.getElementById('t-saving').textContent =
+      'Claude API cheaper at this volume — consider v2.1 until scale grows';
+    document.getElementById('t-saving').style.color = '#d97706';
+  }
+}
+
+// Init
+window._claudeMonthly = 0;
+window._claudeQPD = 200;
+window._claudeCache = 0.30;
+updateClaude();
+updateTrained();
+
+// init cost calculators
+if (typeof updateClaude === 'function') { updateClaude(); }
+if (typeof updateTrained === 'function') { updateTrained(); }
+</script>
+
+</div><!-- .content -->
+</div><!-- .main -->
+
+<script>
+function nav(id) {
+  document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.getElementById('s-' + id).classList.add('active');
+  event.currentTarget.classList.add('active');
+  document.querySelector('.main').scrollTo({ top: 0, behavior: 'smooth' });
+}
+</script>
+</body>
+</html>

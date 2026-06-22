@@ -1,0 +1,13 @@
+[
+  {
+    "product_id": "11111111-1111-1111-1111-111111111111",
+    "name": "Rattan Lounge Chair",
+    "category": "seating",
+    "image_path": "catalog/rattan-lounge.jpg"
+  },
+  {
+    "name": "Walnut Sideboard",
+    "category": "storage",
+    "image_path": "catalog/walnut-sideboard.jpg"
+  }
+]

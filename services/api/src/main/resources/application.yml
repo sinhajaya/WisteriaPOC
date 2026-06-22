@@ -1,0 +1,88 @@
+# ───────────────────────────────────────────────────────────
+# Wisteria API configuration
+# Profiles:
+#   stub  → no Docker needed; in-memory stubs; DB/Flyway disabled
+#   (default / no profile) → full pipeline; requires docker compose up
+# ───────────────────────────────────────────────────────────
+
+spring:
+  application:
+    name: wisteria-api
+  servlet:
+    multipart:
+      max-file-size: 10MB        # engages the 413 path in GlobalExceptionHandler
+      max-request-size: 12MB
+  datasource:
+    url: ${POSTGRES_URL:jdbc:postgresql://localhost:5432/wisteria}
+    username: ${POSTGRES_USER:wisteria}
+    password: ${POSTGRES_PASSWORD:wisteria}
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: 6379
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: none          # schema is owned by Flyway, not Hibernate
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+
+anthropic:
+  api-key: ${ANTHROPIC_API_KEY:}
+  model:
+    extract: ${ANTHROPIC_MODEL_EXTRACT:claude-sonnet-4-6}   # vision style extraction
+    explain: ${ANTHROPIC_MODEL_EXPLAIN:claude-haiku-4-5}    # batched explanations
+
+wisteria:
+  cors:
+    allowed-origin: http://localhost:3000
+  vision:
+    # Active style-extraction provider: vlm (self-hosted Qwen2.5-VL, default, LLD v3.0) | claude (LLD v2.1)
+    provider: ${VISION_PROVIDER:vlm}
+  explain:
+    # Active explanation provider: template (deterministic, LLD v3.0) | claude (Haiku, LLD v2.1)
+    provider: ${EXPLAIN_PROVIDER:template}
+  clip:
+    url: ${CLIP_SERVER_URL:http://localhost:5001}
+    timeout-seconds: 10
+  gate:
+    # Zero-shot furniture gate (open-set rejection). When the image reads as
+    # non-furniture (furniture_prob < threshold), the query short-circuits to an
+    # out-of-domain response (no matches, no score card). Degrades open if the
+    # CLIP /classify endpoint is unavailable.
+    furniture-enabled: ${FURNITURE_GATE_ENABLED:true}
+    furniture-threshold: ${FURNITURE_GATE_THRESHOLD:0.5}
+  vlm:
+    url: ${VLM_SERVER_URL:http://localhost:5002}
+  upload-dir: ${UPLOAD_DIR:/tmp/wisteria-uploads}
+  catalog:
+    # Classpath resource (default) or file: URL for the product catalog manifest.
+    products-file: ${CATALOG_PRODUCTS_FILE:classpath:products.json}
+    # Base dir for resolving each product's image_path. Classpath static dir by default.
+    image-dir: ${CATALOG_IMAGE_DIR:classpath:static/}
+    # Index-time style attributes: extractor (live VLM/Claude, default) | labels
+    # (Claude teacher labels from labels-file — zero API cost, no VLM dependency).
+    attribute-source: ${CATALOG_ATTRIBUTE_SOURCE:extractor}
+    # JSONL of teacher labels (one row per image) used when attribute-source=labels.
+    labels-file: ${CATALOG_LABELS_FILE:file:/catalog/labeled.jsonl}
+
+server:
+  port: 8081
+
+---
+# ── stub profile: run the API layer with ZERO infrastructure ──
+spring:
+  config:
+    activate:
+      on-profile: stub
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+      - org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration
+      - org.springframework.boot.autoconfigure.flyway.FlywayAutoConfiguration
+      - org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration
+
+logging:
+  level:
+    com.wisteria: TRACE

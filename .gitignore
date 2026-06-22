@@ -1,0 +1,52 @@
+HELP.md
+target/
+.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+.env
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+### VS Code ###
+.vscode/
+
+# local run config (contains ANTHROPIC_API_KEY)
+.run/Wisteria API (full).run.xml
+
+### macOS ###
+.DS_Store
+
+### Build artifacts ###
+*.tar.gz
+
+### Images ###
+*.jpg
+*.jpeg
+*.png
+*.gif
+*.webp
+*.bmp
+data/catalog/images/

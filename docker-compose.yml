@@ -1,0 +1,192 @@
+# ─────────────────────────────────────────────────────────────
+# Wisteria Visual Style Matching · Local POC stack (fully containerized)
+# Starts: PostgreSQL + pgvector, Redis, CLIP server, VLM server (v3.0),
+#         Spring Boot API (:8081), React UI behind nginx (:3000).
+#
+# Usage:
+#   docker compose up -d --build  # build + start everything
+#   docker compose logs -f clip          # watch model download (~1.7 GB, first run only)
+#   docker compose down           # stop (data persists in named volumes)
+#   docker compose down -v        # stop AND wipe data
+#
+# The API + UI read secrets/overrides from .env (env_file below); infra URLs
+# are pinned here to compose service names. UI → http://localhost:3000.
+# ─────────────────────────────────────────────────────────────
+
+services:
+
+  # ── Vector database ─────────────────────────────────────────
+  postgres:
+    image: ankane/pgvector:latest
+    container_name: wisteria-postgres
+    environment:
+      POSTGRES_DB: wisteria
+      POSTGRES_USER: wisteria
+      POSTGRES_PASSWORD: wisteria
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U wisteria -d wisteria"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  # ── Response cache (pHash keys) ─────────────────────────────
+  redis:
+    image: redis:7-alpine
+    container_name: wisteria-redis
+    # 256 MB cap + LRU eviction, per LLD v2.1 cache schema
+    command:
+      [
+        "redis-server",
+        "--maxmemory", "256mb",
+        "--maxmemory-policy", "allkeys-lru"
+      ]
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    restart: unless-stopped
+
+  # ── CLIP embedding server (FastAPI + open_clip) ─────────────
+  clip:
+    build:
+      context: services/clip
+    container_name: wisteria-clip
+    ports:
+      - "5001:5001"
+    volumes:
+      # Persist ViT-L/14 weights (~1.7 GB) so restarts don't re-download
+      - clipcache:/root/.cache
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5001/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      # Generous grace period: first start downloads model weights
+      start_period: 600s
+    # CLIP on CPU is memory-hungry; keep the container from being OOM-killed
+    deploy:
+      resources:
+        limits:
+          memory: 6g
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  # ── VLM style-extraction server (FastAPI + Qwen2.5-VL, v3.0) ─
+  # Only needed when wisteria.vision.provider=vlm. On Apple Silicon,
+  # run this on the host instead (Docker has no MPS access).
+  vlm:
+    build:
+      context: services/vlm
+    container_name: wisteria-vlm
+    # Opt-in only: the app normally points VLM_SERVER_URL at the Colab tunnel
+    # (fine-tuned model). This local container is the base-model CPU fallback —
+    # start it explicitly with: docker compose --profile local-vlm up -d vlm
+    profiles: ["local-vlm"]
+    ports:
+      - "5002:5002"
+    environment:
+      # POC default — 2B fits a typical ~8 GB Docker RAM cap (CPU/bf16).
+      # Override to Qwen/Qwen2.5-VL-7B-Instruct on a GPU box.
+      VLM_BASE_MODEL: Qwen/Qwen2-VL-2B-Instruct
+    volumes:
+      # Persist the VLM weights across restarts
+      - vlmcache:/root/.cache
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5002/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 18
+      # First start downloads the checkpoint (~4.4 GB for the 2B)
+      start_period: 900s
+    # Uncomment to expose a host GPU (requires NVIDIA Container Toolkit):
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: 1
+    #           capabilities: [gpu]
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  # ── Spring Boot API (style query + recommendations + explanations) ─
+  api:
+    build:
+      context: services/api
+    container_name: wisteria-api
+    ports:
+      - "8081:8081"
+    # Pull secrets + provider knobs (ANTHROPIC_API_KEY, VISION_PROVIDER,
+    # VLM_SERVER_URL, …) from .env; infra URLs below override the localhost
+    # defaults baked into .env so they resolve on the compose network.
+    env_file:
+      - .env
+    environment:
+      POSTGRES_URL: jdbc:postgresql://postgres:5432/wisteria
+      REDIS_HOST: redis
+      CLIP_SERVER_URL: http://clip:5001
+      # Explanations stay deterministic/self-hosted (no Claude call).
+      EXPLAIN_PROVIDER: template
+      # Catalog mounted read-only below — point the app at the container paths.
+      CATALOG_PRODUCTS_FILE: file:/catalog/products.json
+      CATALOG_IMAGE_DIR: file:/catalog/images/
+      # Index from the Claude teacher labels (labeled.jsonl in the catalog mount)
+      # so indexing needs no live VLM. Query path still uses VISION_PROVIDER.
+      CATALOG_ATTRIBUTE_SOURCE: labels
+      CATALOG_LABELS_FILE: file:/catalog/labeled.jsonl
+    volumes:
+      - ./data/catalog:/catalog:ro
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8081/api/v1/style/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 90s
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      clip:
+        condition: service_healthy
+
+  # ── React UI (nginx-served SPA, proxies /api → api) ───────
+  ui:
+    build:
+      context: services/ui
+    container_name: wisteria-ui
+    ports:
+      - "3000:80"
+    healthcheck:
+      # 127.0.0.1 (not localhost): nginx listens on IPv4 only; localhost
+      # resolves to ::1 inside the container and would refuse the connection.
+      test: ["CMD", "wget", "-q", "-O", "-", "http://127.0.0.1:80/"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+    restart: unless-stopped
+    depends_on:
+      api:
+        condition: service_healthy
+
+volumes:
+  pgdata:      # PostgreSQL data — survives container restarts
+  clipcache:   # CLIP model weights — avoids 1.7 GB re-download
+  vlmcache:    # Qwen2.5-VL weights — avoids ~16 GB re-download
