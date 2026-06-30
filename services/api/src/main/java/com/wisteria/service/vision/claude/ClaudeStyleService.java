@@ -41,8 +41,9 @@ public class ClaudeStyleService implements StyleExtractor {
             You are an interior-design vision system. Look at the image and call the
             extract_style_attributes tool with the single best-fitting value for each field.
             First identify `category` — the KIND of furniture/object that is the main subject
-            (e.g. a sideboard or cabinet is `storage`, a chair or sofa is `seating`). Then the
-            style attributes. Choose only from the provided enum vocabularies.""";
+            (e.g. a sideboard or cabinet is `storage`, a chair or sofa is `seating`, a vase or
+            mirror is `decor`, a pillow or throw is `textile`, a plate or serveware piece is
+            `tabletop`). Then the style attributes. Choose only from the provided enum vocabularies.""";
 
     private final AnthropicClient client;
     private final String model;
@@ -106,7 +107,7 @@ public class ClaudeStyleService implements StyleExtractor {
     private static Tool buildTool() {
         Map<String, Object> properties = Map.of(
                 "category", enumProp("seating", "table", "storage", "bed",
-                        "lighting", "rug", "decor", "other"),
+                        "lighting", "rug", "decor", "textile", "tabletop", "other"),
                 "finish", enumProp("matte", "gloss", "brushed", "aged", "lacquered", "natural"),
                 "material", enumProp("oak", "walnut", "velvet", "brass", "linen", "marble",
                         "rattan", "glass", "leather", "ceramic",

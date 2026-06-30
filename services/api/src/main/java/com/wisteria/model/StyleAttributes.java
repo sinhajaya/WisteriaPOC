@@ -13,7 +13,7 @@ import java.util.Map;
  * overlap scoring is meaningful. {@code rawJson} keeps the full tool response.
  */
 public record StyleAttributes(
-        String furnitureCategory,  // seating | table | storage | bed | lighting | rug | decor | other
+        String furnitureCategory,  // seating | table | storage | bed | lighting | rug | decor | textile | tabletop | other
         String finish,
         String material,
         String silhouette,

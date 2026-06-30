@@ -53,15 +53,21 @@ CATEGORY_RULES = [
     ("storage", ["dresser", "sideboard", "buffet", "cabinet", "bookcase", "bookshelf",
                  "credenza", "chest", "wardrobe", "shelf", "storage", "console",
                  "media", "island"]),
+    # textile & tabletop MUST precede "table": "tabletop"/"tablecloth" contain "table".
+    ("textile", ["pillow", "throw", "blanket", "bedding", "duvet", "quilt", "coverlet",
+                 "sham", "curtain", "drape", "textile", "linen", "towel", "napkin",
+                 "tablecloth", "table runner"]),
+    ("tabletop", ["tabletop", "dinnerware", "flatware", "serveware", "drinkware",
+                  "glassware", "stemware", "barware", "platter", "pitcher", "decanter",
+                  "tureen", "teapot", "mug", "dinner plate", "salad plate", "charger"]),
     ("table", ["table", "desk"]),
-    ("decor", ["pillow", "throw", "bedding", "duvet", "curtain", "textile", "linen",
-               "vase", "mirror", "wall", "art", "candle", "planter", "basket",
-               "tabletop", "dinnerware", "bowl", "plate", "decor", "sculpture",
-               "figurine", "statuary", "object", "server", "tray"]),
+    ("decor", ["vase", "mirror", "wall", "art", "candle", "planter", "basket", "decor",
+               "sculpture", "figurine", "statuary", "object", "bowl", "tray"]),
 ]
 
 # Categories we try to fill (excludes the "other" catch-all).
-TARGET_CATEGORIES = ["seating", "table", "storage", "bed", "lighting", "rug", "decor"]
+TARGET_CATEGORIES = ["seating", "table", "storage", "bed", "lighting", "rug", "decor",
+                     "textile", "tabletop"]
 
 
 def categorize(product: dict) -> str:

@@ -251,7 +251,9 @@ public class RealStyleQueryService implements StyleQueryService {
             "bed", "bed",
             "lighting", "lighting piece",
             "rug", "rug",
-            "decor", "décor piece");
+            "decor", "décor piece",
+            "textile", "textile",
+            "tabletop", "tabletop piece");
 
     /**
      * Fallback explanation built from the PRODUCT's own indexed attributes —

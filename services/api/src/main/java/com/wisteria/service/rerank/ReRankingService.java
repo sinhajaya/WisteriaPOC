@@ -10,29 +10,29 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Re-ranking with an explicit preference order (LLD v2.1 + matching refinement):
- *   1. kind of furniture (category)  — PRIMARY: same-category items always rank first
- *   2. colour (palette)
- *   3. material
- *   4. everything else (finish, silhouette, era, mood)
- *
- * Ordering is lexicographic on category-match, then a bounded blended score:
+ * Re-ranking by a single bounded blended score, so the displayed order always
+ * matches the displayed match scores:
  * <pre>
  *   cosineSim    = 1 - cosineDistance                         (visual, [0,1])
  *   attrOverlap  = Σ weight(field) for each exactly-matching field
- *   finalScore   = 0.30·cosineSim + 0.70·attrOverlap          ∈ [0,1]
+ *   finalScore   = 0.45·cosineSim + 0.55·attrOverlap          ∈ [0,1]
  *   apiScore     = round(finalScore · 100)
  * </pre>
- * The category weight (0.40) exceeds the entire visual contribution, and a
- * category match is also the primary sort key, so a sideboard query ranks all
- * storage items above chairs regardless of visual similarity.
+ * Results are ordered strictly by {@code finalScore} (descending). Category is
+ * NOT a hard sort key — it influences ranking only through its 0.25 weight (a
+ * category match adds 0.25 to the score), so same-category items still tend to
+ * rank high, but a higher-scoring item of a different category is no longer
+ * forced below a lower-scoring same-category one. CLIP visual similarity carries
+ * 0.45 and the style attributes (silhouette, era, mood) carry real weight, so a
+ * mid-century walnut chair query surfaces mid-century chairs over contemporary
+ * ones of the same material — while keeping score order honest.
  *
  * <p><b>Visual floor.</b> The VLM uses a closed furniture vocabulary with no
  * "not furniture" option, so an out-of-domain query (e.g. an auto-rickshaw)
  * still gets confident furniture attributes and can match the catalog on the
  * high-weight category/palette/material fields — inflating {@code finalScore}
  * above the low-confidence threshold even though it looks nothing alike. Since
- * attribute overlap carries 70% of the score, the numeric blend alone can't
+ * attribute overlap carries 55% of the score, the numeric blend alone can't
  * catch this. As a backstop, a top result whose raw visual similarity is below
  * {@link #VISUAL_FLOOR} is forced to {@code lowConfidence} regardless of score:
  * a genuine style match should at least look somewhat similar.
@@ -40,32 +40,40 @@ import java.util.Map;
 @Service
 public class ReRankingService {
 
-    private static final double ALPHA = 0.30;          // visual weight
-    private static final double BETA = 0.70;           // attribute weight
+    private static final double ALPHA = 0.45;          // visual weight (CLIP aesthetic)
+    private static final double BETA = 0.55;           // attribute weight
     private static final double LOW_CONFIDENCE = 0.45;
     // Min raw CLIP cosine similarity for the top hit to count as a confident
     // match. Below this, attribute overlap is likely a closed-vocabulary
     // hallucination on an out-of-domain image — flag low-confidence.
     private static final double VISUAL_FLOOR = 0.50;
 
-    /** Field weights (sum to 1.0), encoding the preference order. */
+    /**
+     * Field weights (sum to 1.0). Category is the PRIMARY sort key, so within a
+     * result set it matches uniformly and its weight no longer separates items;
+     * the remaining weight is spent on the aesthetic — palette/material plus the
+     * style descriptors silhouette/era/mood, which previously rounded to zero.
+     */
     private static final Map<String, Double> WEIGHTS = Map.of(
-            "category", 0.40,
-            "palette", 0.25,    // colour
-            "material", 0.20,
-            "finish", 0.0375,
-            "silhouette", 0.0375,
-            "era", 0.0375,
-            "mood", 0.0375);
+            "category", 0.25,
+            "palette", 0.18,    // colour
+            "material", 0.15,
+            "silhouette", 0.15, // form/line — core aesthetic
+            "era", 0.15,        // period/style — core aesthetic
+            "finish", 0.06,
+            "mood", 0.06);
 
     public RankingOutcome rank(StyleAttributes query, List<CandidateRow> candidates, int topK) {
         Map<String, String> queryMap = query != null ? query.asMap() : Map.of();
 
         List<ScoredCandidate> scored = candidates.stream()
                 .map(c -> score(queryMap, c))
-                // PRIMARY: same furniture category first; then by blended score.
-                .sorted(Comparator.comparing(ScoredCandidate::categoryMatch).reversed()
-                        .thenComparing(Comparator.comparingDouble(ScoredCandidate::finalScore).reversed()))
+                // Order strictly by the blended score, so the displayed order matches
+                // the displayed match scores. Category is no longer a hard primary key
+                // — it still ranks high via its 0.25 weight (a category match adds 0.25
+                // to finalScore), but it can no longer push a low-scoring same-category
+                // item above a higher-scoring one of a different category.
+                .sorted(Comparator.comparingDouble(ScoredCandidate::finalScore).reversed())
                 .limit(Math.max(1, topK))
                 .toList();
 

@@ -7,7 +7,7 @@ scoring at query time.
 """
 
 ENUMS = {
-    "category": ["seating", "table", "storage", "bed", "lighting", "rug", "decor", "other"],
+    "category": ["seating", "table", "storage", "bed", "lighting", "rug", "decor", "textile", "tabletop", "other"],
     "finish": ["matte", "gloss", "brushed", "aged", "lacquered", "natural"],
     "material": ["oak", "walnut", "velvet", "brass", "linen", "marble",
                  "rattan", "glass", "leather", "ceramic",
@@ -23,9 +23,16 @@ FIELDS = list(ENUMS.keys())
 
 SYSTEM = (
     "You are an interior-design vision system. Identify the main furniture/object "
-    "and its style attributes. First pick `category` — the KIND of object (a sideboard "
-    "or cabinet is `storage`, a chair or sofa is `seating`). Choose exactly one value "
-    "per field, only from the allowed vocabularies."
+    "and its style attributes. First pick `category` — the KIND of object, by what it "
+    "physically is (not its style). Use this guidance: a chair, sofa, stool, or bench "
+    "is `seating`; a sideboard, cabinet, dresser, shelf, or bookcase is `storage`; a "
+    "desk, dining, coffee, or side table is `table`; a bed or headboard is `bed`; a "
+    "lamp, pendant, or sconce is `lighting`; a rug or carpet is `rug`; a vase, bowl, "
+    "jar, sculpture, mirror, artwork, tray, basket, or other decorative accessory is "
+    "`decor`; a pillow, throw, blanket, duvet, quilt, bedding, or table linen is "
+    "`textile`; a plate, glass, mug, pitcher, or serveware piece is `tabletop`; use "
+    "`other` only when nothing else fits. Choose exactly one value per field, only "
+    "from the allowed vocabularies."
 )
 
 EXTRACT_TOOL = {

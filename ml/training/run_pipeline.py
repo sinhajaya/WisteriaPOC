@@ -33,6 +33,7 @@ from __future__ import annotations
 
 import argparse
 import base64
+import contextlib
 import hashlib
 import io
 import json
@@ -67,7 +68,7 @@ class ExtractRequest(BaseModel):
 
 # ── taxonomy (single source of truth; must match the rest of the project) ────
 ENUMS = {
-    "category": ["seating", "table", "storage", "bed", "lighting", "rug", "decor", "other"],
+    "category": ["seating", "table", "storage", "bed", "lighting", "rug", "decor", "textile", "tabletop", "other"],
     "finish": ["matte", "gloss", "brushed", "aged", "lacquered", "natural"],
     "material": ["oak", "walnut", "velvet", "brass", "linen", "marble",
                  "rattan", "glass", "leather", "ceramic",
@@ -81,9 +82,16 @@ ENUMS = {
 FIELDS = list(ENUMS)
 SYSTEM = (
     "You are an interior-design vision system. Identify the main furniture/object "
-    "and its style attributes. First pick `category` — the KIND of object (a sideboard "
-    "or cabinet is `storage`, a chair or sofa is `seating`). Choose exactly one value "
-    "per field, only from the allowed vocabularies."
+    "and its style attributes. First pick `category` — the KIND of object, by what it "
+    "physically is (not its style). Use this guidance: a chair, sofa, stool, or bench "
+    "is `seating`; a sideboard, cabinet, dresser, shelf, or bookcase is `storage`; a "
+    "desk, dining, coffee, or side table is `table`; a bed or headboard is `bed`; a "
+    "lamp, pendant, or sconce is `lighting`; a rug or carpet is `rug`; a vase, bowl, "
+    "jar, sculpture, mirror, artwork, tray, basket, or other decorative accessory is "
+    "`decor`; a pillow, throw, blanket, duvet, quilt, bedding, or table linen is "
+    "`textile`; a plate, glass, mug, pitcher, or serveware piece is `tabletop`; use "
+    "`other` only when nothing else fits. Choose exactly one value per field, only "
+    "from the allowed vocabularies."
 )
 CRITERIA = hashlib.sha256(
     json.dumps({"enums": ENUMS, "system": SYSTEM}, sort_keys=True).encode()).hexdigest()[:12]
@@ -106,6 +114,50 @@ def coerce(raw: dict) -> dict:
         value = str(raw.get(field, "")).strip().lower()
         out[field] = value if value in allowed else None
     return out
+
+
+# ── POC #2 craft taxonomy (PDP copy generator) — second endpoint, same VLM ───
+# Free-text (not enums): describes what the photo shows so the brand-voice model
+# can ground materials/craftsmanship copy. Served from /extract-craft with the
+# furniture LoRA DISABLED (base-model behavior), so it isn't biased toward POC #1.
+CRAFT_FIELDS = ["palette", "texture", "weave", "technique", "handmade_cues"]
+CRAFT_SYSTEM = (
+    "You are a craft and textiles vision expert. Look at the product or maker photo "
+    "and describe ONLY what is visibly true, in a few words per field. Never guess "
+    "history, origin, or provenance."
+)
+CRAFT_DESCR = {
+    "palette": "dominant colours / tones",
+    "texture": "surface texture and feel",
+    "weave": "weave or construction pattern (textiles); empty if not applicable",
+    "technique": "visible making technique (e.g. block print, hand-knot, glaze, carving)",
+    "handmade_cues": "visible signs of handwork (irregularities, slubs, tool marks)",
+}
+
+
+def craft_prompt_text() -> str:
+    lines = [CRAFT_SYSTEM, "", "Describe each field:"]
+    lines += [f"- {f}: {d}" for f, d in CRAFT_DESCR.items()]
+    lines += ["", 'Return a single JSON object with these keys, each a short phrase '
+                  '(use "" if not visible). No extra keys, no prose.']
+    return "\n".join(lines)
+
+
+CRAFT_PROMPT = craft_prompt_text()
+
+
+def coerce_craft(raw: dict) -> dict:
+    """Keep the 5 craft strings; attach a flat per-field confidence (0.7 for any
+    field the model populated — a base-model heuristic the gate reads as
+    maxReliedConfidence)."""
+    attrs, conf = {}, {}
+    for f in CRAFT_FIELDS:
+        v = str(raw.get(f, "")).strip()
+        if v:
+            attrs[f] = v
+            conf[f] = 0.7
+    attrs["confidence"] = conf
+    return attrs
 
 
 # ── stage 1: label (Message Batches API — 50% cheaper, runs unattended) ───────
@@ -243,23 +295,58 @@ def stage_train(train_rows, args):
     model.enable_input_require_grads()
 
     def collate(batch):
-        texts = [processor.apply_chat_template(b["messages"], tokenize=False) for b in batch]
         images = [Image.open(b["image"]).convert("RGB") for b in batch]
+        # Token length of each example's prompt (instruction + expanded image tokens +
+        # the assistant generation prefix). MUST be computed from a FRESH prompt string
+        # and BEFORE the main processor() call below: the Qwen2-VL processor rewrites the
+        # image placeholder INTO its `text` argument in place, so a string fed through it
+        # once cannot be fed through again (it would carry many image tokens but one image).
+        prompt_lens = []
+        for b in batch:
+            prompt_text = processor.apply_chat_template(
+                b["messages"][:-1], tokenize=False, add_generation_prompt=True)
+            img = Image.open(b["image"]).convert("RGB")
+            prompt_lens.append(
+                processor(text=[prompt_text], images=[img],
+                          return_tensors="pt")["input_ids"].shape[1])
+
+        texts = [processor.apply_chat_template(b["messages"], tokenize=False) for b in batch]
         mi = processor(text=texts, images=images, padding=True, return_tensors="pt")
         labels = mi["input_ids"].clone()
         labels[labels == processor.tokenizer.pad_token_id] = -100
+        # Supervise ONLY the assistant's JSON answer. Masking just PAD (as before) makes
+        # the model spend its loss predicting the long prompt + image-placeholder tokens,
+        # keeping loss ~9 and starving the category signal. per_device_train_batch_size=1,
+        # so there is no padding and the prompt occupies labels[i, :prompt_len].
+        for i, plen in enumerate(prompt_lens):
+            labels[i, :plen] = -100
         mi["labels"] = labels
         return mi
 
+    # Periodic checkpoints so a Colab disconnect doesn't lose the run. Point
+    # --ckpt-dir at Google Drive (e.g. /content/drive/MyDrive/wisteria/ckpt) so
+    # checkpoints survive a dropped session; on the next run we auto-resume from
+    # the latest one. Each checkpoint carries optimizer + scheduler + RNG state,
+    # so training continues from the exact step, not from scratch.
+    from transformers.trainer_utils import get_last_checkpoint
+    ckpt_dir = args.ckpt_dir
+    os.makedirs(ckpt_dir, exist_ok=True)
+    resume = get_last_checkpoint(ckpt_dir)   # None on a fresh run
+    if resume:
+        print(f">>> train: resuming from checkpoint {resume}", flush=True)
+    else:
+        print(f">>> train: fresh run · checkpoints → {ckpt_dir} (every {args.save_steps} steps)", flush=True)
+
     Trainer(model=model,
             args=TrainingArguments(
-                output_dir="checkpoints", num_train_epochs=args.epochs,
+                output_dir=ckpt_dir, num_train_epochs=args.epochs,
                 per_device_train_batch_size=1, gradient_accumulation_steps=8,
-                learning_rate=1e-4, logging_steps=5, save_strategy="no",
+                learning_rate=1e-4, logging_steps=5,
+                save_strategy="steps", save_steps=args.save_steps, save_total_limit=2,
                 bf16=torch.cuda.is_available(), gradient_checkpointing=True,
                 gradient_checkpointing_kwargs={"use_reentrant": False},
                 report_to="none", remove_unused_columns=False),
-            train_dataset=dataset, data_collator=collate).train()
+            train_dataset=dataset, data_collator=collate).train(resume_from_checkpoint=resume)
 
     os.makedirs(args.adapter_out, exist_ok=True)
     model.save_pretrained(args.adapter_out)
@@ -284,6 +371,21 @@ def _predict_image(model, processor, device, img):
 def _predict(model, processor, device, path):
     return _predict_image(model, processor, device,
                           ImageOps.exif_transpose(Image.open(path)).convert("RGB"))
+
+
+def _predict_craft_image(model, processor, device, img):
+    """POC #2: craft attributes via the craft prompt, with the furniture LoRA
+    disabled (base-model behavior) so it isn't biased toward POC #1's vocab."""
+    messages = [{"role": "user", "content": [{"type": "image", "image": img},
+                                             {"type": "text", "text": CRAFT_PROMPT}]}]
+    chat = processor.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
+    inputs = processor(text=[chat], images=[img], return_tensors="pt").to(device)
+    ctx = model.disable_adapter() if hasattr(model, "disable_adapter") else contextlib.nullcontext()
+    with torch.no_grad(), ctx:
+        gen = model.generate(**inputs, max_new_tokens=220, do_sample=False)
+    text = processor.batch_decode(gen[:, inputs.input_ids.shape[1]:], skip_special_tokens=True)[0]
+    m = re.search(r"\{.*\}", text, re.DOTALL)
+    return coerce_craft(json.loads(m.group(0))) if m else {"confidence": {}}
 
 
 def stage_eval(eval_rows, model, processor, args):
@@ -362,6 +464,17 @@ def stage_serve(model, processor, args):
         attrs["model_ver"] = model_ver
         return attrs
 
+    @app.post("/extract-craft")
+    def extract_craft(req: ExtractRequest):           # POC #2 (PDP) — craft taxonomy
+        try:
+            raw = base64.b64decode(req.image_b64)
+            img = ImageOps.exif_transpose(Image.open(io.BytesIO(raw))).convert("RGB")
+        except Exception:
+            raise HTTPException(status_code=400, detail="invalid_image")
+        attrs = _predict_craft_image(model, processor, device, img)
+        attrs["model_ver"] = model_ver + "-craft"
+        return attrs
+
     @app.get("/health")
     def health():
         return {"status": "ok", "device": str(device), "model_ver": model_ver,
@@ -390,7 +503,11 @@ def stage_serve(model, processor, args):
         if m and not printed:
             printed = True
             print("\n" + "=" * 64 + f"\nVLM_SERVER_URL={m.group(0)}\n" + "=" * 64
-                  + "\n(keep this cell running; paste the URL locally)\n", flush=True)
+                  + "\nServes BOTH POCs from one VLM:"
+                  + "\n  POC #1 (visual search): /extract        (furniture taxonomy, fine-tuned)"
+                  + "\n  POC #2 (PDP copy gen):  /extract-craft  (craft taxonomy, base model)"
+                  + "\nPaste this URL into BOTH apps' VLM_SERVER_URL. Keep this cell running.\n",
+                  flush=True)
     proc.wait()
 
 
@@ -400,6 +517,11 @@ def main() -> int:
     ap.add_argument("--data-dir", default="wisteria_train")
     ap.add_argument("--base-model", default=os.environ.get("VLM_BASE_MODEL", "Qwen/Qwen2-VL-2B-Instruct"))
     ap.add_argument("--adapter-out", default=os.environ.get("VLM_ADAPTER_DIR", "/content/qwen2-vl-2b-wisteria-v1"))
+    # Checkpoint dir for crash/disconnect resume — point at Google Drive to survive
+    # a dropped free-Colab session; the next run auto-resumes from the latest checkpoint.
+    ap.add_argument("--ckpt-dir", default=os.environ.get("VLM_CKPT_DIR", "/content/checkpoints"))
+    ap.add_argument("--save-steps", type=int, default=25,
+                    help="write a checkpoint every N optimizer steps (lower = less lost on disconnect)")
     ap.add_argument("--epochs", type=float, default=3.0)
     ap.add_argument("--eval-split", type=float, default=0.2)
     # POC bar: at this data scale (~19 held-out images) the abstract fields

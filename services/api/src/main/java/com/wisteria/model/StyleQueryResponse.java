@@ -29,7 +29,7 @@ public record StyleQueryResponse(
 
     /** Style DNA extracted from the uploaded image by Claude Vision. */
     public record QueryAttributes(
-            String category,    // seating | table | storage | bed | lighting | rug | decor | other
+            String category,    // seating | table | storage | bed | lighting | rug | decor | textile | tabletop | other
             String finish,      // matte | gloss | brushed | aged | lacquered | natural
             String material,    // oak | walnut | ... | teak | wood | iron | cane | bone
             String silhouette,  // clean-line | curved | ornate | sculptural | minimal

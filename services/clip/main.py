@@ -55,6 +55,17 @@ NON_FURNITURE_PROMPTS = [
     "a photo of a building",
     "an outdoor street scene",
     "a photo of a landscape",
+    # Small objects / hardware / fixtures / close-ups. The gate previously had no
+    # negative for these, so a door knob, faucet or switch had nowhere for its
+    # softmax mass to go except the furniture group, and passed the gate.
+    "a photo of a door knob",
+    "a photo of a door handle",
+    "a close-up photo of door hardware",
+    "a photo of a faucet",
+    "a photo of a light switch or power outlet",
+    "a photo of a tool",
+    "a photo of jewelry",
+    "a photo of an electronic device",
 ]
 _ALL_PROMPTS = FURNITURE_PROMPTS + NON_FURNITURE_PROMPTS
 _N_FURNITURE = len(FURNITURE_PROMPTS)
